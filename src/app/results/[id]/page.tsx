@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, use } from "react";
 import Link from "next/link";
 import {
-  Globe,
   Upload,
   CheckCircle2,
   XCircle,
@@ -29,8 +28,8 @@ import {
   Code2,
   Info,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Navbar } from "@/components/landing/Navbar";
+import { ScrollReveal } from "@/components/landing/ScrollReveal";
 import type {
   AnalysisResult,
   PlatformCompatibility,
@@ -45,11 +44,11 @@ import type {
 function statusIcon(status: CompatibilityStatus) {
   switch (status) {
     case "compatible":
-      return <CheckCircle2 className="w-5 h-5 status-compatible" />;
+      return <CheckCircle2 className="w-5 h-5 text-emerald-500" />;
     case "possible":
-      return <AlertTriangle className="w-5 h-5 status-possible" />;
+      return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
     case "incompatible":
-      return <XCircle className="w-5 h-5 status-incompatible" />;
+      return <XCircle className="w-5 h-5 text-red-500" />;
   }
 }
 
@@ -67,22 +66,22 @@ function statusLabel(status: CompatibilityStatus) {
 function statusColorClass(status: CompatibilityStatus) {
   switch (status) {
     case "compatible":
-      return "status-compatible";
+      return "text-emerald-400";
     case "possible":
-      return "status-possible";
+      return "text-yellow-400";
     case "incompatible":
-      return "status-incompatible";
+      return "text-red-400";
   }
 }
 
 function statusBgClass(status: CompatibilityStatus) {
   switch (status) {
     case "compatible":
-      return "status-bg-compatible";
+      return "bg-emerald-500/10 border-emerald-500/20";
     case "possible":
-      return "status-bg-possible";
+      return "bg-yellow-500/10 border-yellow-500/20";
     case "incompatible":
-      return "status-bg-incompatible";
+      return "bg-red-500/10 border-red-500/20";
   }
 }
 
@@ -169,45 +168,60 @@ function ProjectSummary({ profile, fileCount, projectName }: {
   ];
 
   return (
-    <div className="rounded-xl border border-border/50 bg-card/30 p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
-          <FileCode2 className="w-5 h-5 text-primary" />
+    <div className="glass rounded-2xl p-6 sm:p-8 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[80px] rounded-full pointer-events-none" />
+      
+      <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-white/10">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+            <FileCode2 className="w-6 h-6 text-primary" />
+          </div>
+          <div>
+            <h2 className="font-bold text-xl sm:text-2xl text-white tracking-tight">{projectName}</h2>
+            <p className="text-sm text-neutral-400 mt-1">{fileCount} files analyzed</p>
+          </div>
         </div>
-        <div>
-          <h2 className="font-semibold text-lg">{projectName}</h2>
-          <p className="text-xs text-muted-foreground">{fileCount} files analyzed</p>
-        </div>
+        <Link href="/analyze">
+          <button className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-sm font-medium transition-colors">
+            Analyze Another
+          </button>
+        </Link>
       </div>
 
       {/* Key Info */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+      <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
         {items.map((item) => (
-          <div key={item.label} className="p-3 rounded-lg bg-muted/30 border border-border/30">
-            <div className="flex items-center gap-1.5 mb-1">
-              <item.icon className="w-3 h-3 text-muted-foreground" />
-              <span className="text-[11px] text-muted-foreground uppercase tracking-wider">{item.label}</span>
+          <div key={item.label} className="p-4 rounded-xl bg-black/40 border border-white/5 flex flex-col">
+            <div className="flex items-center gap-2 mb-2">
+              <item.icon className="w-3.5 h-3.5 text-neutral-500" />
+              <span className="text-[11px] text-neutral-500 uppercase tracking-wider font-semibold">{item.label}</span>
             </div>
-            <div className="text-sm font-medium truncate">{item.value}</div>
+            <div className="text-sm font-medium text-white truncate mt-auto">{item.value}</div>
           </div>
         ))}
       </div>
 
       {/* Detected Requirements */}
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-        {booleans.map((item) => (
-          <div
-            key={item.label}
-            className={`flex items-center gap-2 p-2 rounded-lg text-xs border transition-colors ${
-              item.active
-                ? "bg-primary/5 border-primary/15 text-foreground"
-                : "bg-muted/20 border-border/20 text-muted-foreground/50"
-            }`}
-          >
-            <item.icon className={`w-3 h-3 shrink-0 ${item.active ? "text-primary" : ""}`} />
-            <span className="truncate">{item.label}</span>
-          </div>
-        ))}
+      <div className="relative z-10">
+        <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-4">Detected Capabilities</h3>
+        <div className="flex flex-wrap gap-2">
+          {booleans.map((item) => (
+            <div
+              key={item.label}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
+                item.active
+                  ? "bg-primary/10 border-primary/20 text-white"
+                  : "bg-black/40 border-white/5 text-neutral-500"
+              }`}
+            >
+              <item.icon className={`w-3.5 h-3.5 shrink-0 ${item.active ? "text-primary/80" : "opacity-50"}`} />
+              <span>{item.label}</span>
+              {item.active && item.detail && (
+                <span className="ml-1 opacity-60 font-normal">({item.detail})</span>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -224,57 +238,58 @@ function PlatformCard({
 }) {
   return (
     <div
-      className={`rounded-xl border transition-all duration-300 ${
-        expanded ? "border-primary/30 bg-card/60" : "border-border/50 bg-card/30 hover:bg-card/50"
+      className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
+        expanded ? "border-primary/30 bg-white/[0.03]" : "border-white/10 bg-black/40 hover:bg-white/[0.02]"
       }`}
     >
       {/* Header */}
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between p-5 text-left cursor-pointer"
+        className="w-full flex items-center justify-between p-5 sm:p-6 text-left cursor-pointer group"
       >
-        <div className="flex items-center gap-4">
-          {statusIcon(platform.status)}
+        <div className="flex items-center gap-4 sm:gap-5">
+          <div className={`p-2.5 rounded-xl border ${statusBgClass(platform.status)}`}>
+            {statusIcon(platform.status)}
+          </div>
           <div>
-            <div className="font-medium">{platform.platform.name}</div>
-            <div className="text-xs text-muted-foreground mt-0.5">
-              {platform.platform.description.length > 70
-                ? platform.platform.description.substring(0, 70) + "…"
-                : platform.platform.description}
+            <div className="font-bold text-lg text-white group-hover:text-primary transition-colors">{platform.platform.name}</div>
+            <div className="text-sm text-neutral-400 mt-1 hidden sm:block">
+              {platform.platform.description}
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <Badge
-            variant="outline"
-            className={`${statusBgClass(platform.status)} ${statusColorClass(platform.status)} border text-[11px]`}
+        <div className="flex items-center gap-4">
+          <span
+            className={`px-3 py-1 rounded-full border text-xs font-semibold tracking-wide ${statusBgClass(platform.status)} ${statusColorClass(platform.status)}`}
           >
             {statusLabel(platform.status)}
-          </Badge>
-          {expanded ? (
-            <ChevronDown className="w-4 h-4 text-muted-foreground" />
-          ) : (
-            <ChevronRight className="w-4 h-4 text-muted-foreground" />
-          )}
+          </span>
+          <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors hidden sm:flex">
+            {expanded ? (
+              <ChevronDown className="w-4 h-4 text-white" />
+            ) : (
+              <ChevronRight className="w-4 h-4 text-white" />
+            )}
+          </div>
         </div>
       </button>
 
       {/* Expanded Details */}
       {expanded && (
-        <div className="px-5 pb-5 space-y-4 border-t border-border/30 pt-4">
+        <div className="px-5 sm:px-6 pb-6 pt-2 border-t border-white/5">
           {/* Score bar */}
-          <div>
-            <div className="flex items-center justify-between text-xs mb-1.5">
-              <span className="text-muted-foreground">Compatibility Score</span>
-              <span className={`font-mono font-medium ${statusColorClass(platform.status)}`}>
+          <div className="mb-8">
+            <div className="flex items-center justify-between text-sm mb-2">
+              <span className="text-neutral-400 font-medium">Compatibility Score</span>
+              <span className={`font-mono font-bold text-lg ${statusColorClass(platform.status)}`}>
                 {platform.score}/100
               </span>
             </div>
-            <div className="h-1.5 bg-muted/50 rounded-full overflow-hidden">
+            <div className="h-2 bg-black/60 rounded-full overflow-hidden border border-white/5">
               <div
-                className={`h-full rounded-full transition-all duration-500 ${
+                className={`h-full rounded-full transition-all duration-1000 ease-out ${
                   platform.status === "compatible"
-                    ? "bg-green-500"
+                    ? "bg-emerald-500"
                     : platform.status === "possible"
                     ? "bg-yellow-500"
                     : "bg-red-500"
@@ -284,97 +299,108 @@ function PlatformCard({
             </div>
           </div>
 
-          {/* Blockers */}
-          {platform.blockers.length > 0 && (
-            <div>
-              <h4 className="flex items-center gap-1.5 text-xs font-medium mb-2 status-incompatible">
-                <XCircle className="w-3 h-3" />
-                Blockers ({platform.blockers.length})
-              </h4>
-              <div className="space-y-2">
-                {platform.blockers.map((b, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-red-500/5 border border-red-500/10 text-sm">
-                    <div className="font-medium text-xs mb-1 text-red-400">{b.rule}</div>
-                    <p className="text-muted-foreground text-xs leading-relaxed">{b.reason}</p>
-                    {b.suggestion && (
-                      <p className="text-xs text-primary/80 mt-2 flex items-start gap-1">
-                        <Info className="w-3 h-3 mt-0.5 shrink-0" />
-                        {b.suggestion}
-                      </p>
-                    )}
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-6">
+              {/* Blockers */}
+              {platform.blockers.length > 0 && (
+                <div>
+                  <h4 className="flex items-center gap-2 text-sm font-semibold mb-3 text-red-400">
+                    <XCircle className="w-4 h-4" />
+                    Blockers ({platform.blockers.length})
+                  </h4>
+                  <div className="space-y-3">
+                    {platform.blockers.map((b, i) => (
+                      <div key={i} className="p-4 rounded-xl bg-red-500/5 border border-red-500/10">
+                        <div className="font-semibold text-sm mb-1.5 text-red-300">{b.rule}</div>
+                        <p className="text-neutral-400 text-sm leading-relaxed">{b.reason}</p>
+                        {b.suggestion && (
+                          <p className="text-sm text-red-200 mt-3 pt-3 border-t border-red-500/10 flex items-start gap-2">
+                            <Info className="w-4 h-4 mt-0.5 shrink-0 opacity-70" />
+                            {b.suggestion}
+                          </p>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+              )}
+
+              {/* Warnings */}
+              {platform.warnings.length > 0 && (
+                <div>
+                  <h4 className="flex items-center gap-2 text-sm font-semibold mb-3 text-yellow-400">
+                    <AlertTriangle className="w-4 h-4" />
+                    Warnings ({platform.warnings.length})
+                  </h4>
+                  <div className="space-y-3">
+                    {platform.warnings.map((w, i) => (
+                      <div key={i} className="p-4 rounded-xl bg-yellow-500/5 border border-yellow-500/10">
+                        <div className="font-semibold text-sm mb-1.5 text-yellow-300">{w.rule}</div>
+                        <p className="text-neutral-400 text-sm leading-relaxed">{w.reason}</p>
+                        {w.suggestion && (
+                          <p className="text-sm text-yellow-200 mt-3 pt-3 border-t border-yellow-500/10 flex items-start gap-2">
+                            <Info className="w-4 h-4 mt-0.5 shrink-0 opacity-70" />
+                            {w.suggestion}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-6">
+              {/* Passes */}
+              {platform.passes.length > 0 && (
+                <div>
+                  <h4 className="flex items-center gap-2 text-sm font-semibold mb-3 text-emerald-400">
+                    <CheckCircle2 className="w-4 h-4" />
+                    Passed Checks ({platform.passes.length})
+                  </h4>
+                  <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-2.5">
+                    {platform.passes.map((p, i) => (
+                      <div key={i} className="flex items-start gap-2.5 text-sm text-neutral-400">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500/50 shrink-0 mt-0.5" />
+                        {p.description}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Recommendations */}
+              {platform.recommendations.length > 0 && (
+                <div>
+                  <h4 className="flex items-center gap-2 text-sm font-semibold mb-3 text-primary">
+                    <Zap className="w-4 h-4" />
+                    Recommendations
+                  </h4>
+                  <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 space-y-2.5">
+                    {platform.recommendations.map((r, i) => (
+                      <div key={i} className="flex items-start gap-2.5 text-sm text-neutral-300">
+                        <ChevronRight className="w-4 h-4 text-primary/50 shrink-0 mt-0.5" />
+                        {r}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Platform link */}
+              <div className="pt-4">
+                <a
+                  href={platform.platform.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-sm font-medium text-white transition-colors"
+                >
+                  Visit {platform.platform.name}
+                  <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+                </a>
               </div>
             </div>
-          )}
-
-          {/* Warnings */}
-          {platform.warnings.length > 0 && (
-            <div>
-              <h4 className="flex items-center gap-1.5 text-xs font-medium mb-2 status-possible">
-                <AlertTriangle className="w-3 h-3" />
-                Warnings ({platform.warnings.length})
-              </h4>
-              <div className="space-y-2">
-                {platform.warnings.map((w, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-yellow-500/5 border border-yellow-500/10 text-sm">
-                    <div className="font-medium text-xs mb-1 text-yellow-400">{w.rule}</div>
-                    <p className="text-muted-foreground text-xs leading-relaxed">{w.reason}</p>
-                    {w.suggestion && (
-                      <p className="text-xs text-primary/80 mt-2 flex items-start gap-1">
-                        <Info className="w-3 h-3 mt-0.5 shrink-0" />
-                        {w.suggestion}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Passes */}
-          {platform.passes.length > 0 && (
-            <div>
-              <h4 className="flex items-center gap-1.5 text-xs font-medium mb-2 status-compatible">
-                <CheckCircle2 className="w-3 h-3" />
-                Passed Checks ({platform.passes.length})
-              </h4>
-              <div className="space-y-1">
-                {platform.passes.map((p, i) => (
-                  <div key={i} className="flex items-center gap-2 text-xs text-muted-foreground py-1">
-                    <CheckCircle2 className="w-3 h-3 text-green-500/60 shrink-0" />
-                    {p.description}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Recommendations */}
-          {platform.recommendations.length > 0 && (
-            <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
-              <h4 className="text-xs font-medium mb-2 text-primary">Recommendations</h4>
-              <ul className="space-y-1">
-                {platform.recommendations.map((r, i) => (
-                  <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
-                    <ChevronRight className="w-3 h-3 mt-0.5 text-primary/50 shrink-0" />
-                    {r}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Platform link */}
-          <a
-            href={platform.platform.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs text-primary/70 hover:text-primary transition-colors"
-          >
-            Visit {platform.platform.name}
-            <ExternalLink className="w-3 h-3" />
-          </a>
+          </div>
         </div>
       )}
     </div>
@@ -409,12 +435,16 @@ export default function ResultsPage({
         }
 
         setResult(data.result);
+        
+        // Sort platforms by score (highest first)
+        const sortedPlatforms = [...data.result.platforms].sort((a, b) => b.score - a.score);
+        
         // Auto-expand the first non-compatible platform, or the first one
-        const firstInteresting = data.result.platforms.find(
+        const firstInteresting = sortedPlatforms.find(
           (p: PlatformCompatibility) => p.status !== "compatible"
         );
         setExpandedPlatform(
-          firstInteresting?.platform.id || data.result.platforms[0]?.platform.id
+          firstInteresting?.platform.id || sortedPlatforms[0]?.platform.id
         );
       } catch {
         setError("Failed to load results. Please try again.");
@@ -435,12 +465,13 @@ export default function ResultsPage({
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen">
-        <ResultsNav />
-        <main className="flex-1 flex items-center justify-center">
+      <div className="min-h-screen bg-black text-white relative overflow-hidden flex flex-col">
+        <Navbar />
+        <div className="fixed inset-0 bg-grid z-0 pointer-events-none opacity-40" />
+        <main className="relative z-10 flex-1 flex items-center justify-center">
           <div className="text-center">
-            <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto mb-4" />
-            <p className="text-muted-foreground">Loading results…</p>
+            <Loader2 className="w-10 h-10 text-primary animate-spin mx-auto mb-6" />
+            <p className="text-neutral-400 font-medium tracking-wide">Retrieving analysis report…</p>
           </div>
         </main>
       </div>
@@ -449,22 +480,23 @@ export default function ResultsPage({
 
   if (error || !result) {
     return (
-      <div className="flex flex-col min-h-screen">
-        <ResultsNav />
-        <main className="flex-1 flex items-center justify-center px-6">
-          <div className="text-center max-w-md">
-            <div className="w-14 h-14 rounded-2xl bg-destructive/10 flex items-center justify-center mx-auto mb-5 border border-destructive/20">
-              <AlertCircle className="w-6 h-6 text-destructive" />
+      <div className="min-h-screen bg-black text-white relative overflow-hidden flex flex-col">
+        <Navbar />
+        <div className="fixed inset-0 bg-grid z-0 pointer-events-none opacity-40" />
+        <main className="relative z-10 flex-1 flex items-center justify-center px-6">
+          <div className="glass p-10 rounded-3xl text-center max-w-md">
+            <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-6 border border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.15)]">
+              <AlertCircle className="w-8 h-8 text-red-500" />
             </div>
-            <h2 className="text-xl font-bold mb-2">Result not found</h2>
-            <p className="text-sm text-muted-foreground mb-6">
+            <h2 className="text-2xl font-bold mb-3">Result not found</h2>
+            <p className="text-neutral-400 mb-8 leading-relaxed">
               {error || "This result may have expired. Please analyze your project again."}
             </p>
             <Link href="/analyze">
-              <Button className="gap-2 cursor-pointer">
+              <button className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-white text-black hover:bg-neutral-200 rounded-full font-semibold transition-all">
                 <Upload className="w-4 h-4" />
                 Analyze Again
-              </Button>
+              </button>
             </Link>
           </div>
         </main>
@@ -472,68 +504,91 @@ export default function ResultsPage({
     );
   }
 
-  const compatibleCount = result.platforms.filter(
-    (p) => p.status === "compatible"
-  ).length;
-  const possibleCount = result.platforms.filter(
-    (p) => p.status === "possible"
-  ).length;
-  const incompatibleCount = result.platforms.filter(
-    (p) => p.status === "incompatible"
-  ).length;
+  // Sort platforms for display: compatible > possible > incompatible
+  const sortedPlatforms = [...result.platforms].sort((a, b) => {
+    const rank = { compatible: 3, possible: 2, incompatible: 1 };
+    return rank[b.status] - rank[a.status];
+  });
+
+  const compatibleCount = result.platforms.filter((p) => p.status === "compatible").length;
+  const possibleCount = result.platforms.filter((p) => p.status === "possible").length;
+  const incompatibleCount = result.platforms.filter((p) => p.status === "incompatible").length;
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <ResultsNav />
+    <div className="min-h-screen bg-black text-white selection:bg-primary/30 relative overflow-hidden">
+      <Navbar />
+      
+      {/* Backgrounds */}
+      <div className="fixed inset-0 bg-grid z-0 pointer-events-none opacity-40" />
+      <div className="fixed top-20 right-0 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none z-0" />
 
-      <main className="flex-1 px-6 py-10 max-w-4xl mx-auto w-full">
-        {/* Summary Header */}
-        <div className="mb-8 animate-slide-up">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">
-            Analysis Results
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Analyzed on{" "}
-            {new Date(result.analyzedAt).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </p>
-        </div>
+      <main className="relative z-10 pt-32 pb-24 px-6 max-w-5xl mx-auto w-full">
+        
+        {/* Status Summary Cards */}
+        <ScrollReveal>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div className="glass p-6 rounded-2xl border-emerald-500/20 relative overflow-hidden group">
+              <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors" />
+              <div className="relative z-10 flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-semibold text-emerald-500/80 uppercase tracking-wider mb-1">Compatible</div>
+                  <div className="text-4xl font-bold text-white">{compatibleCount}</div>
+                </div>
+                <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+                </div>
+              </div>
+            </div>
+            
+            <div className="glass p-6 rounded-2xl border-yellow-500/20 relative overflow-hidden group">
+              <div className="absolute inset-0 bg-yellow-500/5 group-hover:bg-yellow-500/10 transition-colors" />
+              <div className="relative z-10 flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-semibold text-yellow-500/80 uppercase tracking-wider mb-1">Possible</div>
+                  <div className="text-4xl font-bold text-white">{possibleCount}</div>
+                </div>
+                <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20">
+                  <AlertTriangle className="w-6 h-6 text-yellow-500" />
+                </div>
+              </div>
+            </div>
 
-        {/* Status Summary */}
-        <div className="grid grid-cols-3 gap-3 mb-8 animate-slide-up stagger-1 opacity-0">
-          <div className="p-4 rounded-xl border status-bg-compatible text-center">
-            <div className="text-2xl font-bold status-compatible">{compatibleCount}</div>
-            <div className="text-xs text-muted-foreground mt-1">Compatible</div>
+            <div className="glass p-6 rounded-2xl border-red-500/20 relative overflow-hidden group">
+              <div className="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors" />
+              <div className="relative z-10 flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-semibold text-red-500/80 uppercase tracking-wider mb-1">Incompatible</div>
+                  <div className="text-4xl font-bold text-white">{incompatibleCount}</div>
+                </div>
+                <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/20">
+                  <XCircle className="w-6 h-6 text-red-500" />
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="p-4 rounded-xl border status-bg-possible text-center">
-            <div className="text-2xl font-bold status-possible">{possibleCount}</div>
-            <div className="text-xs text-muted-foreground mt-1">Possible</div>
-          </div>
-          <div className="p-4 rounded-xl border status-bg-incompatible text-center">
-            <div className="text-2xl font-bold status-incompatible">{incompatibleCount}</div>
-            <div className="text-xs text-muted-foreground mt-1">Incompatible</div>
-          </div>
-        </div>
+        </ScrollReveal>
 
         {/* Project Summary */}
-        <div className="mb-8 animate-slide-up stagger-2 opacity-0">
-          <ProjectSummary
-            profile={result.profile}
-            fileCount={result.fileCount}
-            projectName={result.projectName}
-          />
-        </div>
+        <ScrollReveal delay={100}>
+          <div className="mb-12">
+            <ProjectSummary
+              profile={result.profile}
+              fileCount={result.fileCount}
+              projectName={result.projectName}
+            />
+          </div>
+        </ScrollReveal>
 
         {/* Platform Results */}
-        <div className="animate-slide-up stagger-3 opacity-0">
-          <h2 className="font-semibold text-lg mb-4">Platform Compatibility</h2>
-          <div className="space-y-3">
-            {result.platforms.map((p) => (
+        <ScrollReveal delay={200}>
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-2xl font-bold tracking-tight">Platform Compatibility</h2>
+            <span className="text-sm text-neutral-500">
+              Analyzed {new Date(result.analyzedAt).toLocaleDateString()}
+            </span>
+          </div>
+          <div className="space-y-4">
+            {sortedPlatforms.map((p) => (
               <PlatformCard
                 key={p.platform.id}
                 platform={p}
@@ -542,65 +597,44 @@ export default function ResultsPage({
               />
             ))}
           </div>
-        </div>
+        </ScrollReveal>
 
-        {/* Disclaimer */}
-        <div className="mt-10 p-4 rounded-xl border border-border/40 bg-muted/20 text-xs text-muted-foreground leading-relaxed animate-slide-up stagger-4 opacity-0">
-          <div className="flex items-start gap-2">
-            <Info className="w-4 h-4 shrink-0 mt-0.5 text-muted-foreground/70" />
-            <p>
-              Compatibility estimates are based on detected project requirements and
-              platform capabilities. Always verify current platform limits before
-              deployment. Results are based on static analysis and may not capture
-              all runtime behaviors.
-            </p>
+        {/* Disclaimer & Final CTA */}
+        <ScrollReveal delay={300}>
+          <div className="mt-16 grid md:grid-cols-2 gap-6">
+            <div className="p-6 rounded-2xl border border-white/5 bg-white/[0.02] text-sm text-neutral-400 leading-relaxed">
+              <div className="flex items-start gap-3 mb-3">
+                <Info className="w-5 h-5 text-neutral-500 shrink-0" />
+                <h4 className="font-semibold text-white">Disclaimer</h4>
+              </div>
+              <p>
+                Compatibility estimates are based on detected project requirements and platform capabilities. Always verify current platform limits before deployment. Results are based on static analysis and may not capture all dynamic runtime behaviors.
+              </p>
+            </div>
+            
+            <div className="p-8 rounded-2xl glass flex flex-col justify-center items-center text-center">
+              <h4 className="font-bold text-lg mb-2">Have another project?</h4>
+              <p className="text-neutral-400 text-sm mb-6">Drop in a new ZIP archive to instantly see where it can be hosted.</p>
+              <Link href="/analyze">
+                <button className="cta-glow flex items-center gap-2 px-6 py-3 bg-white text-black hover:bg-neutral-200 rounded-full font-semibold transition-all">
+                  <Upload className="w-4 h-4" />
+                  Analyze Another Project
+                </button>
+              </Link>
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
 
-        {/* Actions */}
-        <div className="flex items-center justify-center gap-4 mt-8 mb-12 animate-slide-up stagger-5 opacity-0">
-          <Link href="/analyze">
-            <Button variant="outline" className="gap-2 cursor-pointer">
-              <Upload className="w-4 h-4" />
-              Analyze Another Project
-            </Button>
-          </Link>
-        </div>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border/50 py-6 px-6">
-        <div className="max-w-6xl mx-auto flex items-center justify-center">
-          <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} HostWhere — Know where your code can actually run.
+      <footer className="border-t border-white/[0.06] py-10 px-6 relative z-10 bg-black">
+        <div className="max-w-5xl mx-auto flex items-center justify-center text-center">
+          <p className="text-sm text-neutral-500">
+            © {new Date().getFullYear()} HostWhere — Free and open-source project analyzer.
           </p>
         </div>
       </footer>
     </div>
-  );
-}
-
-function ResultsNav() {
-  return (
-    <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:border-primary/40 transition-colors">
-            <Globe className="w-4 h-4 text-primary" />
-          </div>
-          <span className="font-semibold text-lg tracking-tight">
-            Host<span className="gradient-text">Where</span>
-          </span>
-        </Link>
-        <div className="flex items-center gap-4">
-          <Link href="/analyze">
-            <Button size="sm" variant="outline" className="gap-2 cursor-pointer">
-              <Upload className="w-3.5 h-3.5" />
-              New Analysis
-            </Button>
-          </Link>
-        </div>
-      </div>
-    </nav>
   );
 }

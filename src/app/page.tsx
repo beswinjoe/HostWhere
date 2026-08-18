@@ -1,434 +1,329 @@
 import Link from "next/link";
-import {
-  Upload,
-  Search,
+import { 
+  ArrowRight, 
+  ArrowDown,
+  FileArchive,
   CheckCircle2,
-  XCircle,
-  AlertTriangle,
   Cpu,
   Database,
-  Globe,
-  FileCode2,
-  Server,
   Container,
+  Server,
   Zap,
-  ArrowRight,
-  ChevronDown,
-  Clock,
-  Shield,
-  Code2,
-  Box,
-  Wifi,
-  Timer,
-  Settings,
   GitBranch,
+  Settings,
+  Shield,
+  Box,
   Terminal,
+  Wifi,
+  FileCode2,
+  XCircle
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Navbar } from "@/components/landing/Navbar";
+import { ScrollReveal } from "@/components/landing/ScrollReveal";
 
-// ─────────────────────────────────────────────────────────────
-// Landing Page
-// ─────────────────────────────────────────────────────────────
-
-export default function Home() {
+export default function LandingPage() {
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:border-primary/40 transition-colors">
-              <Globe className="w-4 h-4 text-primary" />
-            </div>
-            <span className="font-semibold text-lg tracking-tight">
-              Host<span className="gradient-text">Where</span>
+    <div className="min-h-screen bg-black text-white selection:bg-primary/30 relative overflow-hidden">
+      <Navbar />
+
+      {/* Global Background Grid & Glow */}
+      <div className="fixed inset-0 bg-grid z-0 pointer-events-none opacity-40" />
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[800px] bg-primary/5 blur-[120px] rounded-full pointer-events-none z-0" />
+
+      <main className="relative z-10 pt-32 pb-24">
+        
+        {/* ─── Hero Section ────────────────────────────────────────────── */}
+        <section className="px-6 flex flex-col items-center justify-center text-center max-w-5xl mx-auto mb-32 relative">
+          <div className="hero-glow" />
+          
+          <div className="hero-animate hero-delay-1 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-8">
+            <ScanLine className="w-3.5 h-3.5 text-primary" />
+            <span className="text-[11px] font-medium tracking-wide uppercase text-neutral-300">
+              Free & Open-Source Project Analyzer
             </span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link
-              href="#how-it-works"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
-            >
-              How it works
-            </Link>
-            <Link
-              href="#platforms"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
-            >
-              Platforms
-            </Link>
-            <Link href="/analyze">
-              <Button size="sm" className="gap-2 cursor-pointer">
-                <Upload className="w-3.5 h-3.5" />
-                Analyze Project
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="relative flex-1 flex flex-col items-center justify-center px-6 pt-24 pb-20 bg-grid overflow-hidden">
-        {/* Gradient orb */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
-
-        <div className="relative max-w-3xl mx-auto text-center animate-slide-up">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-8 rounded-full border border-border/60 bg-muted/50 text-xs text-muted-foreground">
-            <Zap className="w-3 h-3 text-primary" />
-            Free &amp; open-source project analyzer
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.1] mb-6">
-            Know where your code
-            <br />
-            <span className="gradient-text glow-text">can actually run.</span>
+          <h1 className="hero-animate hero-delay-2 text-6xl sm:text-7xl md:text-[5.5rem] font-bold tracking-tight leading-[1.1] mb-6">
+            Know where your code <br />
+            <span className="gradient-text">can actually run.</span>
           </h1>
 
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-xl mx-auto mb-10 leading-relaxed">
-            Upload your project ZIP. HostWhere analyzes your stack, dependencies,
-            and infrastructure requirements — then tells you which hosting
-            platforms are compatible.
+          <p className="hero-animate hero-delay-3 text-lg sm:text-xl text-neutral-400 max-w-2xl mx-auto mb-10 leading-relaxed font-light">
+            Upload your project ZIP. HostWhere analyzes your stack, dependencies, and infrastructure requirements — then tells you which hosting platforms are compatible.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/analyze">
-              <Button
-                size="lg"
-                className="gap-2 text-base px-8 h-12 glow cursor-pointer"
-              >
-                <Upload className="w-4 h-4" />
-                Upload &amp; Analyze
+          <div className="hero-animate hero-delay-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/analyze" className="w-full sm:w-auto">
+              <button className="cta-glow w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-white text-black hover:bg-neutral-200 rounded-full font-semibold transition-all">
+                Upload & Analyze
                 <ArrowRight className="w-4 h-4" />
-              </Button>
+              </button>
             </Link>
-            <Link href="#how-it-works">
-              <Button
-                variant="outline"
-                size="lg"
-                className="gap-2 text-base px-8 h-12 cursor-pointer"
-              >
+            <a href="#how-it-works" className="w-full sm:w-auto">
+              <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full font-semibold text-white transition-all group arrow-hover">
                 See how it works
-                <ChevronDown className="w-4 h-4" />
-              </Button>
-            </Link>
+                <ArrowDown className="w-4 h-4 text-neutral-400 arrow-icon" />
+              </button>
+            </a>
           </div>
-        </div>
+        </section>
 
-        {/* Example Result Preview */}
-        <div className="relative mt-20 w-full max-w-2xl mx-auto animate-slide-up stagger-2 opacity-0">
-          <div className="rounded-xl border border-border/60 bg-card/50 backdrop-blur-sm p-6 space-y-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-2 h-2 rounded-full bg-red-500" />
-              <div className="w-2 h-2 rounded-full bg-yellow-500" />
-              <div className="w-2 h-2 rounded-full bg-green-500" />
-              <span className="ml-2 text-xs text-muted-foreground font-mono">
-                discord-bot.zip — analysis result
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { name: "Vercel", status: "incompatible" as const },
-                { name: "Railway", status: "compatible" as const },
-                { name: "Netlify", status: "incompatible" as const },
-                { name: "Render", status: "compatible" as const },
-              ].map((p) => (
-                <div
-                  key={p.name}
-                  className={`rounded-lg border p-3 text-center ${
-                    p.status === "compatible"
-                      ? "status-bg-compatible"
-                      : "status-bg-incompatible"
-                  }`}
-                >
-                  <div className="flex items-center justify-center gap-1.5 mb-1">
-                    {p.status === "compatible" ? (
-                      <CheckCircle2 className="w-3.5 h-3.5 status-compatible" />
-                    ) : (
-                      <XCircle className="w-3.5 h-3.5 status-incompatible" />
-                    )}
-                    <span className="text-sm font-medium">{p.name}</span>
+        {/* ─── Product Preview Section ─────────────────────────────────── */}
+        <ScrollReveal className="px-6 mb-40">
+          <div className="max-w-5xl mx-auto">
+            <div className="glass rounded-2xl p-2 sm:p-4 overflow-hidden relative shadow-2xl">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+              
+              <div className="bg-black/80 rounded-xl border border-white/10 overflow-hidden">
+                {/* Fake browser header */}
+                <div className="h-12 border-b border-white/10 flex items-center px-4 gap-4 bg-white/[0.02]">
+                  <div className="flex gap-2">
+                    <div className="w-3 h-3 rounded-full bg-neutral-800" />
+                    <div className="w-3 h-3 rounded-full bg-neutral-800" />
+                    <div className="w-3 h-3 rounded-full bg-neutral-800" />
                   </div>
-                  <span
-                    className={`text-[10px] uppercase tracking-wider font-medium ${
-                      p.status === "compatible"
-                        ? "status-compatible"
-                        : "status-incompatible"
-                    }`}
-                  >
-                    {p.status === "compatible" ? "Compatible" : "Incompatible"}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex items-center gap-2 pt-2 text-xs text-muted-foreground">
-              <AlertTriangle className="w-3 h-3 text-yellow-500" />
-              Discord Gateway requires a persistent process. Serverless platforms
-              not suitable.
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section
-        id="how-it-works"
-        className="py-24 px-6 border-t border-border/50"
-      >
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight mb-4">
-              How it works
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-lg mx-auto">
-              Three simple steps. No account required. No data stored.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                step: "01",
-                icon: Upload,
-                title: "Upload your ZIP",
-                description:
-                  "Drop your project ZIP file. We support any framework — Next.js, Express, Flask, Django, Rails, and more.",
-              },
-              {
-                step: "02",
-                icon: Search,
-                title: "We analyze everything",
-                description:
-                  "Our engine statically analyzes your code for framework, runtime, databases, WebSockets, workers, Docker, and 15+ other signals.",
-              },
-              {
-                step: "03",
-                icon: CheckCircle2,
-                title: "See your results",
-                description:
-                  "Get instant compatibility results for 7 hosting platforms with detailed explanations and migration suggestions.",
-              },
-            ].map((item) => (
-              <div
-                key={item.step}
-                className="relative group p-6 rounded-xl border border-border/50 bg-card/30 hover:bg-card/60 hover:border-primary/20 transition-all duration-300"
-              >
-                <div className="text-xs font-mono text-primary/50 mb-4">
-                  {item.step}
-                </div>
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/15 transition-colors">
-                  <item.icon className="w-5 h-5 text-primary" />
-                </div>
-                <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* What we detect */}
-      <section className="py-24 px-6 border-t border-border/50 bg-muted/20">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight mb-4">
-              What we detect
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-lg mx-auto">
-              Deep static analysis across 15+ dimensions of your project.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {[
-              { icon: FileCode2, label: "Framework" },
-              { icon: Code2, label: "Language" },
-              { icon: Cpu, label: "Runtime" },
-              { icon: Box, label: "Package Manager" },
-              { icon: Settings, label: "Dependencies" },
-              { icon: Terminal, label: "Build & Start Scripts" },
-              { icon: Container, label: "Dockerfile" },
-              { icon: Database, label: "Databases" },
-              { icon: Wifi, label: "WebSockets" },
-              { icon: Server, label: "Background Workers" },
-              { icon: Timer, label: "Cron Jobs" },
-              { icon: Clock, label: "Persistent Process" },
-              { icon: Shield, label: "Env Variables" },
-              { icon: GitBranch, label: "Monorepo" },
-              { icon: Globe, label: "Static vs Dynamic" },
-              { icon: Zap, label: "Serverless Compat" },
-            ].map((item) => (
-              <div
-                key={item.label}
-                className="flex items-center gap-3 p-3 rounded-lg border border-border/40 bg-card/20 hover:bg-card/50 transition-colors"
-              >
-                <item.icon className="w-4 h-4 text-primary/70 shrink-0" />
-                <span className="text-sm">{item.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Supported Platforms */}
-      <section id="platforms" className="py-24 px-6 border-t border-border/50">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight mb-4">
-              Supported platforms
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-lg mx-auto">
-              We evaluate compatibility against 7 major hosting platforms.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {[
-              {
-                name: "Vercel",
-                category: "Serverless",
-                url: "vercel.com",
-              },
-              {
-                name: "Netlify",
-                category: "Serverless",
-                url: "netlify.com",
-              },
-              {
-                name: "Cloudflare Workers",
-                category: "Edge Serverless",
-                url: "workers.cloudflare.com",
-              },
-              {
-                name: "Railway",
-                category: "PaaS",
-                url: "railway.app",
-              },
-              {
-                name: "Render",
-                category: "PaaS",
-                url: "render.com",
-              },
-              {
-                name: "Fly.io",
-                category: "PaaS",
-                url: "fly.io",
-              },
-              {
-                name: "VPS / Docker",
-                category: "Container / VPS",
-                url: "docker.com",
-              },
-            ].map((p) => (
-              <div
-                key={p.name}
-                className="p-4 rounded-xl border border-border/50 bg-card/30 hover:border-primary/20 hover:bg-card/60 transition-all duration-300 group"
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Server className="w-4 h-4 text-primary/70" />
-                  </div>
-                  <div>
-                    <div className="font-medium text-sm">{p.name}</div>
-                    <div className="text-[11px] text-muted-foreground">
-                      {p.category}
+                  <div className="flex-1 flex justify-center">
+                    <div className="px-4 py-1.5 rounded-md bg-white/5 border border-white/10 text-xs text-neutral-400 font-mono flex items-center gap-2">
+                      <FileArchive className="w-3 h-3 text-primary" />
+                      discord-bot.zip — analysis result
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* FAQ */}
-      <section className="py-24 px-6 border-t border-border/50 bg-muted/20">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight mb-4">
-              Frequently asked questions
-            </h2>
-          </div>
+                {/* Content */}
+                <div className="p-6 sm:p-10 grid md:grid-cols-2 gap-8 lg:gap-12 bg-grid" style={{ backgroundSize: '24px 24px' }}>
+                  
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-medium text-neutral-400 uppercase tracking-wider mb-6">Compatibility Overview</h3>
+                    
+                    <div className="platform-card flex items-center justify-between p-4 rounded-xl border border-white/10 bg-white/5">
+                      <div className="flex items-center gap-3">
+                        <XCircle className="w-5 h-5 text-red-500" />
+                        <span className="font-semibold">Vercel</span>
+                      </div>
+                      <span className="text-xs font-medium px-2 py-1 rounded-md bg-red-500/10 text-red-400 border border-red-500/20">Incompatible</span>
+                    </div>
 
-          <div className="space-y-4">
-            {[
-              {
-                q: "Is my code safe?",
-                a: "Absolutely. We perform static analysis only — your code is never executed, dependencies are never installed, and your ZIP is processed in memory and immediately discarded. Nothing is stored.",
-              },
-              {
-                q: "How accurate are the results?",
-                a: "Compatibility estimates are based on detected project requirements and platform capabilities. Our deterministic rules engine doesn't use AI for decisions — it's pure pattern matching. Always verify current platform limits before deployment.",
-              },
-              {
-                q: "What frameworks are supported?",
-                a: "We detect 25+ frameworks including Next.js, React, Vue, Nuxt, Svelte, SvelteKit, Angular, Astro, Express, Flask, Django, FastAPI, Rails, Laravel, and more. Static HTML sites are also fully supported.",
-              },
-              {
-                q: "What file types should be in the ZIP?",
-                a: "Include your project source files — package.json, requirements.txt, Dockerfile, source code, etc. We automatically skip node_modules, .git, dist, and other build artifacts.",
-              },
-              {
-                q: "Is this free?",
-                a: "Yes, HostWhere is completely free and open-source. No account required.",
-              },
-            ].map((item) => (
-              <details
-                key={item.q}
-                className="group rounded-xl border border-border/50 bg-card/30 transition-all hover:bg-card/50"
-              >
-                <summary className="flex items-center justify-between p-5 cursor-pointer list-none">
-                  <span className="font-medium text-sm">{item.q}</span>
-                  <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" />
-                </summary>
-                <div className="px-5 pb-5 text-sm text-muted-foreground leading-relaxed">
-                  {item.a}
+                    <div className="platform-card flex items-center justify-between p-4 rounded-xl border border-white/10 bg-white/5">
+                      <div className="flex items-center gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                        <span className="font-semibold">Railway</span>
+                      </div>
+                      <span className="text-xs font-medium px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Compatible</span>
+                    </div>
+
+                    <div className="platform-card flex items-center justify-between p-4 rounded-xl border border-white/10 bg-white/5 opacity-50">
+                      <div className="flex items-center gap-3">
+                        <XCircle className="w-5 h-5 text-red-500" />
+                        <span className="font-semibold">Netlify</span>
+                      </div>
+                    </div>
+
+                    <div className="platform-card flex items-center justify-between p-4 rounded-xl border border-white/10 bg-white/5 opacity-50">
+                      <div className="flex items-center gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                        <span className="font-semibold">Render</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col justify-center">
+                    <div className="relative">
+                      {/* Connection line hidden on mobile */}
+                      <div className="hidden md:block absolute top-1/2 -left-12 w-12 h-px bg-white/10" />
+                      
+                      <div className="p-6 rounded-2xl bg-red-500/5 border border-red-500/20 shadow-[0_0_40px_rgba(239,68,68,0.05)]">
+                        <div className="flex items-start gap-4">
+                          <div className="p-2 bg-red-500/10 rounded-lg">
+                            <XCircle className="w-5 h-5 text-red-500" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-red-400 mb-2">Blocker detected</h4>
+                            <p className="text-sm text-neutral-300 leading-relaxed">
+                              Discord Gateway requires a persistent process. Serverless platforms are not suitable.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
-              </details>
+              </div>
+            </div>
+          </div>
+        </ScrollReveal>
+
+        {/* ─── How It Works ────────────────────────────────────────────── */}
+        <section id="how-it-works" className="px-6 mb-40 max-w-6xl mx-auto scroll-mt-24">
+          <ScrollReveal>
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">How It Works</h2>
+              <p className="text-neutral-400 text-lg">Three simple steps to infrastructure clarity.</p>
+            </div>
+          </ScrollReveal>
+
+          <div className="grid md:grid-cols-3 gap-6 relative">
+            {/* Connecting line */}
+            <div className="hidden md:block absolute top-8 left-[16%] right-[16%] h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+            <ScrollReveal delay={100}>
+              <div className="glass p-8 rounded-3xl relative h-full">
+                <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-8 relative z-10">
+                  <span className="text-2xl font-bold text-neutral-500">01</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Upload</h3>
+                <p className="text-neutral-400 leading-relaxed">
+                  Drop your project ZIP file. We don&apos;t store your code, and the analysis runs entirely in memory.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={200}>
+              <div className="glass p-8 rounded-3xl relative h-full">
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-8 relative z-10 shadow-[0_0_30px_rgba(59,130,246,0.15)]">
+                  <span className="text-2xl font-bold text-primary">02</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Analyze</h3>
+                <p className="text-neutral-400 leading-relaxed">
+                  Our engine scans your `package.json`, configuration files, and directory structure to understand your stack.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={300}>
+              <div className="glass p-8 rounded-3xl relative h-full">
+                <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-8 relative z-10">
+                  <span className="text-2xl font-bold text-neutral-500">03</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Know Where It Runs</h3>
+                <p className="text-neutral-400 leading-relaxed">
+                  Get a detailed compatibility report across major hosting platforms, with specific blockers and warnings.
+                </p>
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
+
+        {/* ─── Platforms ───────────────────────────────────────────────── */}
+        <section id="platforms" className="px-6 mb-40 max-w-6xl mx-auto scroll-mt-24">
+          <ScrollReveal>
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">Supported Platforms</h2>
+              <p className="text-neutral-400 text-lg max-w-2xl mx-auto">
+                We evaluate your project against the rules and limitations of the most popular modern hosting providers.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          <ScrollReveal delay={200}>
+            <div className="flex flex-wrap justify-center gap-3 md:gap-4">
+              {['Vercel', 'Cloudflare', 'Railway', 'Render', 'Netlify', 'Fly.io', 'Docker'].map((platform) => (
+                <div key={platform} className="px-6 py-4 glass rounded-2xl font-semibold text-lg text-neutral-300 hover:text-white transition-colors cursor-default">
+                  {platform}
+                </div>
+              ))}
+            </div>
+          </ScrollReveal>
+        </section>
+
+        {/* ─── What We Detect ──────────────────────────────────────────── */}
+        <section id="features" className="px-6 mb-40 max-w-6xl mx-auto scroll-mt-24">
+          <ScrollReveal>
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">Comprehensive Analysis</h2>
+              <p className="text-neutral-400 text-lg">Our 12 static analysis detectors leave no stone unturned.</p>
+            </div>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {[
+              { icon: FileCode2, label: "Frameworks" },
+              { icon: Cpu, label: "Runtimes" },
+              { icon: Box, label: "Dependencies" },
+              { icon: Terminal, label: "Versions" },
+              { icon: Server, label: "Persistent processes" },
+              { icon: Database, label: "Databases" },
+              { icon: Shield, label: "Environment variables" },
+              { icon: Wifi, label: "Ports" },
+              { icon: Container, label: "Docker configs" },
+              { icon: Settings, label: "Build commands" },
+              { icon: Zap, label: "Serverless compatibility" },
+              { icon: GitBranch, label: "Background workers" },
+            ].map((feature, i) => (
+              <ScrollReveal key={feature.label} delay={i * 50}>
+                <div className="flex items-center gap-3 p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-colors">
+                  <feature.icon className="w-5 h-5 text-primary/70 shrink-0" />
+                  <span className="text-sm font-medium text-neutral-300">{feature.label}</span>
+                </div>
+              </ScrollReveal>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA */}
-      <section className="py-24 px-6 border-t border-border/50">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl font-bold tracking-tight mb-4">
-            Ready to find out where your project can run?
-          </h2>
-          <p className="text-muted-foreground mb-8">
-            No sign-up. No tracking. Just answers.
-          </p>
-          <Link href="/analyze">
-            <Button size="lg" className="gap-2 text-base px-8 h-12 glow cursor-pointer">
-              <Upload className="w-4 h-4" />
-              Analyze My Project
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          </Link>
-        </div>
-      </section>
+        {/* ─── Final CTA ───────────────────────────────────────────────── */}
+        <section className="px-6 max-w-4xl mx-auto">
+          <ScrollReveal>
+            <div className="p-12 md:p-20 rounded-3xl glass text-center relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent opacity-50" />
+              <div className="relative z-10">
+                <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
+                  Stop guessing where your project can run.
+                </h2>
+                <p className="text-xl text-neutral-400 mb-10 font-light">
+                  Analyze it before you deploy.
+                </p>
+                <Link href="/analyze">
+                  <button className="cta-glow inline-flex items-center justify-center gap-2 px-10 py-5 bg-white text-black hover:bg-neutral-200 rounded-full text-lg font-bold transition-all shadow-[0_0_40px_rgba(255,255,255,0.1)] arrow-hover">
+                    Analyze My Project
+                    <ArrowRight className="w-5 h-5 arrow-icon" />
+                  </button>
+                </Link>
+              </div>
+            </div>
+          </ScrollReveal>
+        </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border/50 py-8 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      </main>
+
+      {/* ─── Footer ──────────────────────────────────────────────────── */}
+      <footer className="border-t border-white/[0.06] py-12 px-6 relative z-10 bg-black">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <Globe className="w-4 h-4 text-primary/70" />
-            <span className="text-sm font-medium">HostWhere</span>
+            <div className="w-6 h-6 rounded-md bg-white/[0.06] flex items-center justify-center border border-white/[0.08]">
+              <ScanLine className="w-3 h-3 text-white/50" />
+            </div>
+            <span className="font-semibold text-sm tracking-tight text-neutral-400">
+              HostWhere
+            </span>
           </div>
-          <p className="text-xs text-muted-foreground text-center max-w-md">
-            Compatibility estimates are based on detected project requirements
-            and platform capabilities. Always verify current platform limits
-            before deployment.
+          <p className="text-sm text-neutral-500">
+            © {new Date().getFullYear()} HostWhere. Free and open-source project analyzer.
           </p>
-          <div className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} HostWhere
-          </div>
         </div>
       </footer>
     </div>
+  );
+}
+
+// Quick inline icon component to avoid one more import up top
+function ScanLine(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <line x1="3" x2="21" y1="12" y2="12" />
+      <line x1="3" x2="21" y1="6" y2="6" />
+      <line x1="3" x2="21" y1="18" y2="18" />
+    </svg>
   );
 }
