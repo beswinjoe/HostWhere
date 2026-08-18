@@ -80,10 +80,20 @@ export function evaluateCloudflare(profile: ProjectProfile): PlatformCompatibili
     status = "possible";
   }
 
+  let why = "";
+  if (status === "incompatible") {
+    why = `Cloudflare Workers are incompatible because this project requires ${blockers.map(b => b.rule).join(", ")}.`;
+  } else if (status === "possible") {
+    why = `Cloudflare can host this project, but there are limitations regarding ${warnings.map(w => w.rule).join(", ")}.`;
+  } else {
+    why = `Cloudflare Workers are an excellent fit for this Edge-compatible project.`;
+  }
+
   return {
     platform: PLATFORMS.cloudflare,
     status,
     score,
+    why,
     blockers,
     warnings,
     passes,

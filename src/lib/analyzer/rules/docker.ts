@@ -90,10 +90,20 @@ export function evaluateDocker(profile: ProjectProfile): PlatformCompatibility {
     status = "possible";
   }
 
+  let why = "";
+  if (status === "incompatible") {
+    why = `A VPS/Docker setup is not recommended because ${blockers.map(b => b.rule).join(", ")}.`;
+  } else if (status === "possible") {
+    why = `A VPS/Docker setup will work, but be mindful of ${warnings.map(w => w.rule).join(", ")}.`;
+  } else {
+    why = `A generic VPS or Docker environment can host this project perfectly, offering maximum control.`;
+  }
+
   return {
     platform: PLATFORMS.docker,
     status,
     score,
+    why,
     blockers,
     warnings,
     passes,

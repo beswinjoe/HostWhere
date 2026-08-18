@@ -22,6 +22,12 @@ import { evaluateRailway } from "./rules/railway";
 import { evaluateRender } from "./rules/render";
 import { evaluateFlyIo } from "./rules/flyio";
 import { evaluateDocker } from "./rules/docker";
+import { evaluateHeroku } from "./rules/heroku";
+import { evaluateDigitalOcean } from "./rules/digitalocean";
+import { evaluateKoyeb } from "./rules/koyeb";
+import { evaluateAWS } from "./rules/aws";
+import { evaluateGoogleCloud } from "./rules/googlecloud";
+import { evaluateAzure } from "./rules/azure";
 
 export async function analyzeProject(files: ProjectFiles, projectName: string = "uploaded-project"): Promise<AnalysisResult> {
   // 1. Run all detectors
@@ -95,7 +101,47 @@ export async function analyzeProject(files: ProjectFiles, projectName: string = 
     });
   }
 
-  // 3. Build the Project Profile
+  // 3. Compute Deployment Type & Confidence
+  let deploymentType: ProjectProfile["deploymentType"] = "Unknown";
+  let confidenceScore = 0;
+  let confidenceReason = "";
+
+  if (persistentRes.requiresPersistentProcess) {
+    if (workerRes.usesWorkers) {
+      deploymentType = "Background worker";
+    } else {
+      deploymentType = "Long-running server";
+    }
+  } else if (staticSiteRes.staticSite) {
+    deploymentType = "Static frontend";
+  } else if (dockerRes.usesDocker) {
+    deploymentType = "Docker service";
+  } else if (frameworkRes.framework === "nextjs" || frameworkRes.framework === "nuxt" || frameworkRes.framework === "sveltekit") {
+    deploymentType = "Serverless application";
+  } else if (runtimeRes.runtime !== "unknown") {
+    deploymentType = "Long-running server"; // fallback for standard express/flask apps
+  }
+
+  // Calculate confidence based on evidence quality
+  const hasPackageJSON = dependencyRes.evidence?.some(e => e.file === "package.json");
+  const hasRequirements = dependencyRes.evidence?.some(e => e.file === "requirements.txt" || e.file === "pyproject.toml" || e.file === "Pipfile");
+  const hasDockerfile = dockerRes.evidence?.some(e => e.file.toLowerCase().includes("dockerfile"));
+  
+  if (hasPackageJSON || hasRequirements || hasDockerfile) {
+    confidenceScore = 95;
+    confidenceReason = "High confidence: Core configuration files (package.json, requirements.txt, or Dockerfile) were found and analyzed.";
+  } else if (runtimeRes.runtime !== "unknown" && frameworkRes.framework !== "unknown") {
+    confidenceScore = 75;
+    confidenceReason = "Moderate confidence: Found recognizable source files, but explicit deployment configuration is missing.";
+  } else if (runtimeRes.runtime !== "unknown") {
+    confidenceScore = 50;
+    confidenceReason = "Low confidence: Only generic language files found. Configuration is highly ambiguous.";
+  } else {
+    confidenceScore = 20;
+    confidenceReason = "Very low confidence: Unrecognized project structure.";
+  }
+
+  // 4. Build the Project Profile
   const profile: ProjectProfile = {
     framework: frameworkRes.framework || null,
     language: runtimeRes.language || "unknown",
@@ -116,6 +162,9 @@ export async function analyzeProject(files: ProjectFiles, projectName: string = 
     nodeVersion: runtimeRes.nodeVersion || null,
     pythonVersion: runtimeRes.pythonVersion || null,
     detectedRequirements,
+    deploymentType,
+    confidenceScore,
+    confidenceReason,
     evidence: [
       ...(frameworkRes.evidence || []),
       ...(runtimeRes.evidence || []),
@@ -132,7 +181,7 @@ export async function analyzeProject(files: ProjectFiles, projectName: string = 
     ],
   };
 
-  // 4. Run rules engine against platforms
+  // 5. Run rules engine against platforms
   const platforms: PlatformCompatibility[] = [
     evaluateVercel(profile),
     evaluateNetlify(profile),
@@ -141,9 +190,15 @@ export async function analyzeProject(files: ProjectFiles, projectName: string = 
     evaluateRender(profile),
     evaluateFlyIo(profile),
     evaluateDocker(profile),
+    evaluateHeroku(profile),
+    evaluateDigitalOcean(profile),
+    evaluateKoyeb(profile),
+    evaluateAWS(profile),
+    evaluateGoogleCloud(profile),
+    evaluateAzure(profile),
   ];
 
-  // 5. Return full result
+  // 6. Return full result
   return {
     id: generateId(),
     profile,

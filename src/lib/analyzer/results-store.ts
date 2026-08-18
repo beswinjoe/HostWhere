@@ -57,5 +57,14 @@ export class InMemoryResultsStore implements ResultsStore {
   }
 }
 
-// Global instance. Can be swapped with RedisStore/PostgresStore later.
-export const resultsStore = new InMemoryResultsStore();
+// Factory
+export function createResultsStore(): ResultsStore {
+  const provider = process.env.RESULTS_STORE || "in-memory";
+  if (provider === "redis") {
+    throw new Error("Redis ResultsStore not implemented yet. Use RESULTS_STORE=in-memory");
+  }
+  return new InMemoryResultsStore();
+}
+
+// Global instance
+export const resultsStore = createResultsStore();

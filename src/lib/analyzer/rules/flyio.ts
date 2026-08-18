@@ -89,10 +89,20 @@ export function evaluateFlyIo(profile: ProjectProfile): PlatformCompatibility {
     status = "possible";
   }
 
+  let why = "";
+  if (status === "incompatible") {
+    why = `Fly.io is incompatible because of ${blockers.map(b => b.rule).join(", ")}.`;
+  } else if (status === "possible") {
+    why = `Fly.io can run this, but you must configure your fly.toml properly for ${warnings.map(w => w.rule).join(", ")}.`;
+  } else {
+    why = `Fly.io is an excellent match, especially if you need global distribution for this workload.`;
+  }
+
   return {
     platform: PLATFORMS.flyio,
     status,
     score,
+    why,
     blockers,
     warnings,
     passes,

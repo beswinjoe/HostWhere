@@ -437,6 +437,41 @@ function PlatformCard({
   );
 }
 
+function RecommendationCard({ platform }: { platform: PlatformCompatibility }) {
+  if (!platform || platform.status !== "compatible") return null;
+
+  return (
+    <div className="glass p-8 rounded-2xl border border-primary/30 relative overflow-hidden group">
+      <div className="absolute inset-0 bg-primary/5 group-hover:bg-primary/10 transition-colors" />
+      <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/20 blur-[60px] rounded-full pointer-events-none" />
+      
+      <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Zap className="w-5 h-5 text-primary" />
+            <h2 className="text-sm font-semibold tracking-wider uppercase text-primary">Recommended Platform</h2>
+          </div>
+          <h3 className="text-3xl font-bold text-white mb-3">
+            Best match: {platform.platform.name}
+          </h3>
+          <p className="text-neutral-300 leading-relaxed max-w-2xl text-base">
+            {platform.why || platform.platform.description}
+          </p>
+        </div>
+        <a 
+          href={platform.platform.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="shrink-0 flex items-center gap-2 px-6 py-3 bg-white text-black hover:bg-neutral-200 rounded-full font-semibold transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+        >
+          Deploy to {platform.platform.name}
+          <ExternalLink className="w-4 h-4" />
+        </a>
+      </div>
+    </div>
+  );
+}
+
 // ─────────────────────────────────────────────────────────────
 // Results Page
 // ─────────────────────────────────────────────────────────────
@@ -608,6 +643,15 @@ export default function ResultsPage({
             />
           </div>
         </ScrollReveal>
+
+        {/* Recommendation Card */}
+        {sortedPlatforms[0]?.status === "compatible" && (
+          <ScrollReveal delay={150}>
+            <div className="mb-12">
+              <RecommendationCard platform={sortedPlatforms[0]} />
+            </div>
+          </ScrollReveal>
+        )}
 
         {/* Platform Results */}
         <ScrollReveal delay={200}>

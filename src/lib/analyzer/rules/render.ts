@@ -93,10 +93,20 @@ export function evaluateRender(profile: ProjectProfile): PlatformCompatibility {
     status = "possible";
   }
 
+  let why = "";
+  if (status === "incompatible") {
+    why = `Render is incompatible because of ${blockers.map(b => b.rule).join(", ")}.`;
+  } else if (status === "possible") {
+    why = `Render is a great choice, but be aware of limitations regarding ${warnings.map(w => w.rule).join(", ")}.`;
+  } else {
+    why = `Render fully supports the persistent processes, databases, and environments required by this project.`;
+  }
+
   return {
     platform: PLATFORMS.render,
     status,
     score,
+    why,
     blockers,
     warnings,
     passes,

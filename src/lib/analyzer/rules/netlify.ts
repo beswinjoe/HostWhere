@@ -86,10 +86,20 @@ export function evaluateNetlify(profile: ProjectProfile): PlatformCompatibility 
     status = "possible";
   }
 
+  let why = "";
+  if (status === "incompatible") {
+    why = `Netlify is incompatible because this project requires ${blockers.map(b => b.rule).join(", ")}.`;
+  } else if (status === "possible") {
+    why = `Netlify can host this project, but there are limitations regarding ${warnings.map(w => w.rule).join(", ")}.`;
+  } else {
+    why = `Netlify is an excellent fit for this ${profile.framework || "static"} project.`;
+  }
+
   return {
     platform: PLATFORMS.netlify,
     status,
     score,
+    why,
     blockers,
     warnings,
     passes,

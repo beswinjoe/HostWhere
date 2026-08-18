@@ -33,6 +33,14 @@ export type Runtime =
   | "static"
   | "unknown";
 
+export type DeploymentType =
+  | "Static frontend"
+  | "Serverless application"
+  | "Long-running server"
+  | "Background worker"
+  | "Docker service"
+  | "Unknown";
+
 export type PackageManager =
   | "npm"
   | "yarn"
@@ -98,7 +106,13 @@ export type PlatformId =
   | "railway"
   | "render"
   | "flyio"
-  | "docker";
+  | "docker"
+  | "heroku"
+  | "digitalocean"
+  | "koyeb"
+  | "aws"
+  | "googlecloud"
+  | "azure";
 
 export type CompatibilityStatus = "compatible" | "possible" | "incompatible";
 export type IssueSeverity = "blocker" | "warning";
@@ -153,6 +167,9 @@ export interface ProjectProfile {
   nodeVersion: string | null;
   pythonVersion: string | null;
   evidence: Evidence[];
+  deploymentType: DeploymentType;
+  confidenceScore: number;
+  confidenceReason: string;
 }
 
 // ── Compatibility Results ─────────────────────────────────────
@@ -175,6 +192,7 @@ export interface PlatformCompatibility {
   platform: PlatformInfo;
   status: CompatibilityStatus;
   score: number;
+  why: string;
   blockers: CompatibilityIssue[];
   warnings: CompatibilityIssue[];
   passes: CompatibilityCheck[];

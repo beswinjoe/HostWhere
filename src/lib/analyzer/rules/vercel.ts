@@ -119,14 +119,21 @@ export function evaluateVercel(profile: ProjectProfile): PlatformCompatibility {
     status = "possible";
   }
 
+  let why = "";
   if (status === "incompatible") {
-      recommendations.push("Consider deploying to Railway, Render, or a VPS which support long-running processes and native WebSockets.");
+    why = `Vercel is incompatible because this project requires ${blockers.map(b => b.rule).join(", ")}. Serverless functions are not suitable for this workload.`;
+    recommendations.push("Consider deploying to Railway, Render, or a VPS which support long-running processes and native WebSockets.");
+  } else if (status === "possible") {
+    why = `Vercel can host this project, but there are limitations regarding ${warnings.map(w => w.rule).join(", ")}.`;
+  } else {
+    why = `Vercel is an excellent fit for this ${profile.framework || "static"} project, offering native support and seamless serverless execution.`;
   }
 
   return {
     platform: PLATFORMS.vercel,
     status,
     score,
+    why,
     blockers,
     warnings,
     passes,

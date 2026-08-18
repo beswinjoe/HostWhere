@@ -7,6 +7,7 @@ export interface RateLimitResult {
 
 export interface RateLimiter {
   check(ip: string): Promise<RateLimitResult>;
+  cleanup?(): void;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -96,10 +97,21 @@ export class InMemoryRateLimiter implements RateLimiter {
   }
 }
 
-// Global instance (can be swapped with RedisRateLimiter later)
-export const rateLimiter = new InMemoryRateLimiter();
+// Factory
+export function createRateLimiter(): RateLimiter {
+  const provider = process.env.RATE_LIMITER || "in-memory";
+  if (provider === "redis") {
+    throw new Error("Redis RateLimiter not implemented yet. Use RATE_LIMITER=in-memory");
+  }
+  return new InMemoryRateLimiter();
+}
+
+// Global instance
+export const rateLimiter = createRateLimiter();
 
 // Run cleanup every hour
 if (typeof setInterval !== "undefined") {
-  setInterval(() => rateLimiter.cleanup(), 60 * 60 * 1000);
+  setInterval(() => {
+    if (rateLimiter.cleanup) rateLimiter.cleanup();
+  }, 60 * 60 * 1000);
 }

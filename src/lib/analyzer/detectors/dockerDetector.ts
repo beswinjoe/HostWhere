@@ -20,10 +20,20 @@ export function dockerDetector(files: ProjectFiles): DetectorResult {
   for (const df of dockerFiles) {
     if (files.has(df)) {
       usesDocker = true;
+      const content = files.get(df) || "";
+      let snippet = `Docker file detected: ${df}`;
+      
+      if (df.toLowerCase() === "dockerfile") {
+        const exposeMatch = content.match(/EXPOSE\s+(\d+)/i);
+        if (exposeMatch) {
+          snippet += ` (Exposes port ${exposeMatch[1]})`;
+        }
+      }
+
       evidence.push({
         file: df,
         type: "file-presence",
-        snippet: `Docker file detected: ${df}`,
+        snippet,
       });
     }
   }
