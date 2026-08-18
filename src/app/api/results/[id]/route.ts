@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { getResult } from "@/lib/analyzer/results-cache";
+import { resultsStore } from "@/lib/analyzer/results-store";
 
 export async function GET(
   _request: NextRequest,
@@ -7,7 +7,7 @@ export async function GET(
 ) {
   const { id } = await params;
 
-  const result = getResult(id);
+  const result = await resultsStore.getResult(id);
 
   if (!result) {
     return Response.json(

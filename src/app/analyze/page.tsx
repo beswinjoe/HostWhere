@@ -15,11 +15,13 @@ import {
   Container,
   Cpu,
   Wifi,
+  ArrowRight,
+  GitBranch
 } from "lucide-react";
 import { Navbar } from "@/components/landing/Navbar";
 
 const ANALYSIS_STEPS = [
-  { icon: FileArchive, label: "Extracting ZIP archive…", key: "extract" },
+  { icon: FileArchive, label: "Fetching & extracting project…", key: "extract" },
   { icon: FileCode2, label: "Detecting framework & language…", key: "framework" },
   { icon: Cpu, label: "Identifying runtime & package manager…", key: "runtime" },
   { icon: Database, label: "Scanning for database usage…", key: "database" },
@@ -33,7 +35,9 @@ export default function AnalyzePage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [mode, setMode] = useState<"zip" | "github">("zip");
   const [file, setFile] = useState<File | null>(null);
+  const [githubUrl, setGithubUrl] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -41,8 +45,8 @@ export default function AnalyzePage() {
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragging(true);
-  }, []);
+    if (mode === "zip") setIsDragging(true);
+  }, [mode]);
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -52,6 +56,8 @@ export default function AnalyzePage() {
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
+    if (mode !== "zip") return;
+    
     setError(null);
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile?.name.endsWith(".zip")) {
@@ -59,7 +65,7 @@ export default function AnalyzePage() {
     } else {
       setError("Only .zip files are supported.");
     }
-  }, []);
+  }, [mode]);
 
   const handleFileSelect = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,7 +81,8 @@ export default function AnalyzePage() {
   );
 
   const handleAnalyze = useCallback(async () => {
-    if (!file) return;
+    if (mode === "zip" && !file) return;
+    if (mode === "github" && !githubUrl) return;
 
     setIsAnalyzing(true);
     setError(null);
@@ -87,11 +94,15 @@ export default function AnalyzePage() {
         if (prev < ANALYSIS_STEPS.length - 1) return prev + 1;
         return prev;
       });
-    }, 600);
+    }, 800);
 
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      if (mode === "zip" && file) {
+        formData.append("file", file);
+      } else if (mode === "github") {
+        formData.append("githubUrl", githubUrl);
+      }
 
       const response = await fetch("/api/analyze", {
         method: "POST",
@@ -118,7 +129,7 @@ export default function AnalyzePage() {
       setError("Network error. Please check your connection and try again.");
       setIsAnalyzing(false);
     }
-  }, [file, router]);
+  }, [mode, file, githubUrl, router]);
 
   const handleRemoveFile = useCallback(() => {
     setFile(null);
@@ -141,7 +152,7 @@ export default function AnalyzePage() {
               Analyze your project
             </h1>
             <p className="text-neutral-400">
-              Upload a ZIP of your codebase to discover where it can run.
+              Upload a ZIP or provide a public GitHub URL to discover where it can run.
             </p>
           </div>
 
@@ -152,65 +163,126 @@ export default function AnalyzePage() {
               
               {!isAnalyzing ? (
                 <>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileSelect}
-                    accept=".zip"
-                    className="hidden"
-                  />
-
-                  {/* Upload State */}
-                  {!file ? (
-                    <div
-                      className={`upload-zone relative flex flex-col items-center justify-center py-16 px-6 text-center rounded-2xl cursor-pointer ${
-                        isDragging ? "drag-over" : ""
+                  {/* Mode Toggle */}
+                  <div className="flex p-1 bg-white/5 rounded-xl mb-8 border border-white/5">
+                    <button
+                      onClick={() => { setMode("zip"); setError(null); }}
+                      className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg transition-all ${
+                        mode === "zip" 
+                          ? "bg-white/10 text-white shadow-sm" 
+                          : "text-neutral-500 hover:text-neutral-300"
                       }`}
-                      onDragOver={handleDragOver}
-                      onDragLeave={handleDragLeave}
-                      onDrop={handleDrop}
-                      onClick={() => fileInputRef.current?.click()}
                     >
-                      <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-6 shadow-inner">
-                        <Upload className="w-8 h-8 text-neutral-400" />
-                      </div>
-                      <h3 className="text-lg font-semibold mb-2">Drop your project ZIP</h3>
-                      <p className="text-sm text-neutral-500 mb-6 max-w-xs">
-                        Supports Next.js, Node, Python, static sites, and more. Max 50MB.
-                      </p>
-                      <button className="px-6 py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full text-sm font-medium transition-colors">
-                        Browse Files
-                      </button>
-                    </div>
-                  ) : (
-                    /* File Selected State */
-                    <div className="flex flex-col items-center">
-                      <div className="w-full p-4 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between mb-8">
-                        <div className="flex items-center gap-3 overflow-hidden">
-                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                            <FileArchive className="w-5 h-5 text-primary" />
-                          </div>
-                          <div className="overflow-hidden">
-                            <p className="font-medium text-sm truncate">{file.name}</p>
-                            <p className="text-xs text-neutral-500 mt-0.5">
-                              {(file.size / 1024 / 1024).toFixed(2)} MB
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={handleRemoveFile}
-                          className="p-2 hover:bg-white/10 rounded-lg transition-colors text-neutral-400 hover:text-white shrink-0"
-                          aria-label="Remove file"
+                      <Upload className="w-4 h-4" />
+                      Upload ZIP
+                    </button>
+                    <button
+                      onClick={() => { setMode("github"); setError(null); }}
+                      className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg transition-all ${
+                        mode === "github" 
+                          ? "bg-white/10 text-white shadow-sm" 
+                          : "text-neutral-500 hover:text-neutral-300"
+                      }`}
+                    >
+                      <GitBranch className="w-4 h-4" />
+                      GitHub URL
+                    </button>
+                  </div>
+
+                  {mode === "zip" ? (
+                    /* ZIP UPLOAD MODE */
+                    <>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileSelect}
+                        accept=".zip"
+                        className="hidden"
+                      />
+
+                      {!file ? (
+                        <div
+                          className={`upload-zone relative flex flex-col items-center justify-center py-16 px-6 text-center rounded-2xl cursor-pointer ${
+                            isDragging ? "drag-over" : ""
+                          }`}
+                          onDragOver={handleDragOver}
+                          onDragLeave={handleDragLeave}
+                          onDrop={handleDrop}
+                          onClick={() => fileInputRef.current?.click()}
                         >
-                          <X className="w-4 h-4" />
-                        </button>
+                          <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-6 shadow-inner">
+                            <Upload className="w-8 h-8 text-neutral-400" />
+                          </div>
+                          <h3 className="text-lg font-semibold mb-2">Drop your project ZIP</h3>
+                          <p className="text-sm text-neutral-500 mb-6 max-w-xs">
+                            Supports Next.js, Node, Python, static sites, and more. Max 50MB.
+                          </p>
+                          <button className="px-6 py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full text-sm font-medium transition-colors">
+                            Browse Files
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center">
+                          <div className="w-full p-4 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between mb-8">
+                            <div className="flex items-center gap-3 overflow-hidden">
+                              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                                <FileArchive className="w-5 h-5 text-primary" />
+                              </div>
+                              <div className="overflow-hidden">
+                                <p className="font-medium text-sm text-white truncate">{file.name}</p>
+                                <p className="text-xs text-neutral-500 mt-0.5">
+                                  {(file.size / 1024 / 1024).toFixed(2)} MB
+                                </p>
+                              </div>
+                            </div>
+                            <button
+                              onClick={handleRemoveFile}
+                              className="p-2 hover:bg-white/10 rounded-lg transition-colors text-neutral-400 hover:text-white shrink-0"
+                              aria-label="Remove file"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+
+                          <button
+                            onClick={handleAnalyze}
+                            className="cta-glow w-full flex items-center justify-center gap-2 px-8 py-4 bg-white text-black hover:bg-neutral-200 rounded-full font-bold text-lg transition-all"
+                          >
+                            Start Analysis
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    /* GITHUB MODE */
+                    <div className="flex flex-col items-center">
+                      <div className="w-full mb-8">
+                        <label className="block text-sm font-medium text-neutral-300 mb-2">
+                          Repository URL
+                        </label>
+                        <input
+                          type="url"
+                          placeholder="https://github.com/owner/repo"
+                          value={githubUrl}
+                          onChange={(e) => {
+                            setGithubUrl(e.target.value);
+                            setError(null);
+                          }}
+                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                          onKeyDown={(e) => e.key === "Enter" && handleAnalyze()}
+                        />
+                        <p className="text-xs text-neutral-500 mt-3">
+                          Public repositories only. Uses the `main` or `master` branch. Max 50MB archive.
+                        </p>
                       </div>
 
                       <button
                         onClick={handleAnalyze}
-                        className="cta-glow w-full flex items-center justify-center gap-2 px-8 py-4 bg-white text-black hover:bg-neutral-200 rounded-full font-bold text-lg transition-all"
+                        disabled={!githubUrl}
+                        className="cta-glow disabled:opacity-50 disabled:pointer-events-none disabled:shadow-none w-full flex items-center justify-center gap-2 px-8 py-4 bg-white text-black hover:bg-neutral-200 rounded-full font-bold text-lg transition-all"
                       >
                         Start Analysis
+                        <ArrowRight className="w-5 h-5" />
                       </button>
                     </div>
                   )}

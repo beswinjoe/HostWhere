@@ -27,6 +27,7 @@ import {
   AlertCircle,
   Code2,
   Info,
+  Share2,
 } from "lucide-react";
 import { Navbar } from "@/components/landing/Navbar";
 import { ScrollReveal } from "@/components/landing/ScrollReveal";
@@ -146,6 +147,26 @@ function ProjectSummary({ profile, fileCount, projectName }: {
   fileCount: number;
   projectName: string;
 }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = useCallback(async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: `HostWhere Analysis: ${projectName}`,
+          text: `Check out the hosting compatibility report for ${projectName}`,
+          url: window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
+    } catch (e) {
+      console.error("Share failed", e);
+    }
+  }, [projectName]);
+
   const items = [
     { icon: FileCode2, label: "Framework", value: frameworkLabel(profile.framework) },
     { icon: Code2, label: "Language", value: profile.language },
@@ -181,11 +202,20 @@ function ProjectSummary({ profile, fileCount, projectName }: {
             <p className="text-sm text-neutral-400 mt-1">{fileCount} files analyzed</p>
           </div>
         </div>
-        <Link href="/analyze">
-          <button className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-sm font-medium transition-colors">
-            Analyze Another
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={handleShare}
+            className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-sm font-medium transition-colors text-white"
+          >
+            {copied ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <Share2 className="w-4 h-4" />}
+            {copied ? "Copied!" : "Share Report"}
           </button>
-        </Link>
+          <Link href="/analyze">
+            <button className="flex items-center gap-2 px-4 py-2 bg-white text-black hover:bg-neutral-200 rounded-full text-sm font-medium transition-colors">
+              Analyze Another
+            </button>
+          </Link>
+        </div>
       </div>
 
       {/* Key Info */}
