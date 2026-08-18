@@ -23,7 +23,7 @@ export function Navbar() {
           <div className="w-7 h-7 rounded-lg bg-white/[0.06] flex items-center justify-center border border-white/[0.08]">
             <Scan className="w-3.5 h-3.5 text-white/80" />
           </div>
-          <span className="font-bold text-[15px] tracking-tight text-white">
+          <span className="font-display font-extrabold text-[19px] md:text-[22px] tracking-tight text-white">
             HostWhere
           </span>
         </Link>

@@ -43,7 +43,7 @@ export default function LandingPage() {
             </span>
           </div>
 
-          <h1 className="hero-animate hero-delay-2 text-6xl sm:text-7xl md:text-[5.5rem] font-bold tracking-tight leading-[1.1] mb-6">
+          <h1 className="hero-animate hero-delay-2 font-display text-[clamp(3.5rem,7vw,7rem)] font-extrabold tracking-[-0.05em] leading-[0.95] mb-6">
             Know where your code <br />
             <span className="gradient-text">can actually run.</span>
           </h1>
@@ -158,7 +158,7 @@ export default function LandingPage() {
         <section id="how-it-works" className="px-6 mb-40 max-w-6xl mx-auto scroll-mt-24">
           <ScrollReveal>
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">How It Works</h2>
+              <h2 className="font-display text-[40px] md:text-[64px] font-extrabold tracking-[-0.035em] mb-4 leading-tight">How It Works</h2>
               <p className="text-neutral-400 text-lg">Three simple steps to infrastructure clarity.</p>
             </div>
           </ScrollReveal>
@@ -209,7 +209,7 @@ export default function LandingPage() {
         <section id="platforms" className="px-6 mb-40 max-w-6xl mx-auto scroll-mt-24">
           <ScrollReveal>
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">Supported Platforms</h2>
+              <h2 className="font-display text-[40px] md:text-[64px] font-extrabold tracking-[-0.035em] mb-4 leading-tight">Supported Platforms</h2>
               <p className="text-neutral-400 text-lg max-w-2xl mx-auto">
                 We evaluate your project against the rules and limitations of the most popular modern hosting providers.
               </p>
@@ -231,7 +231,7 @@ export default function LandingPage() {
         <section id="features" className="px-6 mb-40 max-w-6xl mx-auto scroll-mt-24">
           <ScrollReveal>
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">Comprehensive Analysis</h2>
+              <h2 className="font-display text-[40px] md:text-[64px] font-extrabold tracking-[-0.035em] mb-4 leading-tight">Comprehensive Analysis</h2>
               <p className="text-neutral-400 text-lg">Our 12 static analysis detectors leave no stone unturned.</p>
             </div>
           </ScrollReveal>
@@ -267,7 +267,7 @@ export default function LandingPage() {
             <div className="p-12 md:p-20 rounded-3xl glass text-center relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent opacity-50" />
               <div className="relative z-10">
-                <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
+                <h2 className="font-display text-[40px] md:text-[64px] font-extrabold tracking-[-0.035em] mb-6 leading-tight">
                   Stop guessing where your project can run.
                 </h2>
                 <p className="text-xl text-neutral-400 mb-10 font-light">

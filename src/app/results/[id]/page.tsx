@@ -282,7 +282,7 @@ function PlatformCard({
             {statusIcon(platform.status)}
           </div>
           <div>
-            <div className="font-bold text-lg text-white group-hover:text-primary transition-colors">{platform.platform.name}</div>
+            <div className="font-display font-bold text-[32px] md:text-[42px] tracking-[-0.03em] text-white group-hover:text-primary transition-colors leading-none mb-1 sm:mb-0">{platform.platform.name}</div>
             <div className="text-sm text-neutral-400 mt-1 hidden sm:block">
               {platform.platform.description}
             </div>
@@ -311,9 +311,9 @@ function PlatformCard({
           <div className="mb-8">
             <div className="flex items-center justify-between text-sm mb-2">
               <span className="text-neutral-400 font-medium">Compatibility Score</span>
-              <span className={`font-mono font-bold text-lg ${statusColorClass(platform.status)}`}>
-                {platform.score}/100
-              </span>
+              <div className={`font-display font-extrabold tracking-[-0.035em] text-[48px] md:text-[64px] leading-none ${statusColorClass(platform.status)}`}>
+                {platform.score}<span className="text-[24px] md:text-[32px] text-neutral-500 font-bold tracking-normal">/100</span>
+              </div>
             </div>
             <div className="h-2 bg-black/60 rounded-full overflow-hidden border border-white/5">
               <div
@@ -451,7 +451,7 @@ function RecommendationCard({ platform }: { platform: PlatformCompatibility }) {
             <Zap className="w-5 h-5 text-primary" />
             <h2 className="text-sm font-semibold tracking-wider uppercase text-primary">Recommended Platform</h2>
           </div>
-          <h3 className="text-3xl font-bold text-white mb-3">
+          <h3 className="font-display text-[48px] md:text-[64px] font-extrabold tracking-[-0.035em] text-white mb-3 leading-tight">
             Best match: {platform.platform.name}
           </h3>
           <p className="text-neutral-300 leading-relaxed max-w-2xl text-base">
@@ -597,7 +597,7 @@ export default function ResultsPage({
               <div className="relative z-10 flex items-center justify-between">
                 <div>
                   <div className="text-sm font-semibold text-emerald-500/80 uppercase tracking-wider mb-1">Compatible</div>
-                  <div className="text-4xl font-bold text-white">{compatibleCount}</div>
+                  <div className="font-display text-[48px] md:text-[64px] font-extrabold text-white leading-none tracking-[-0.035em]">{compatibleCount}</div>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
                   <CheckCircle2 className="w-6 h-6 text-emerald-500" />
@@ -610,7 +610,7 @@ export default function ResultsPage({
               <div className="relative z-10 flex items-center justify-between">
                 <div>
                   <div className="text-sm font-semibold text-yellow-500/80 uppercase tracking-wider mb-1">Possible</div>
-                  <div className="text-4xl font-bold text-white">{possibleCount}</div>
+                  <div className="font-display text-[48px] md:text-[64px] font-extrabold text-white leading-none tracking-[-0.035em]">{possibleCount}</div>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20">
                   <AlertTriangle className="w-6 h-6 text-yellow-500" />
@@ -623,7 +623,7 @@ export default function ResultsPage({
               <div className="relative z-10 flex items-center justify-between">
                 <div>
                   <div className="text-sm font-semibold text-red-500/80 uppercase tracking-wider mb-1">Incompatible</div>
-                  <div className="text-4xl font-bold text-white">{incompatibleCount}</div>
+                  <div className="font-display text-[48px] md:text-[64px] font-extrabold text-white leading-none tracking-[-0.035em]">{incompatibleCount}</div>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/20">
                   <XCircle className="w-6 h-6 text-red-500" />

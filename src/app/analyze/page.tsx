@@ -148,10 +148,10 @@ export default function AnalyzePage() {
         <div className="w-full max-w-xl hero-animate">
           
           <div className="text-center mb-10">
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
+            <h1 className="font-display text-[48px] md:text-[64px] font-extrabold tracking-[-0.035em] mb-4 leading-tight">
               Analyze your project
             </h1>
-            <p className="text-neutral-400">
+            <p className="text-[18px] md:text-[20px] text-neutral-400 font-medium">
               Upload a ZIP or provide a public GitHub URL to discover where it can run.
             </p>
           </div>
@@ -214,7 +214,7 @@ export default function AnalyzePage() {
                             <Upload className="w-8 h-8 text-neutral-400" />
                           </div>
                           <h3 className="text-lg font-semibold mb-2">Drop your project ZIP</h3>
-                          <p className="text-sm text-neutral-500 mb-6 max-w-xs">
+                          <p className="text-[14px] md:text-[16px] text-neutral-500 mb-6 max-w-xs">
                             Supports Next.js, Node, Python, static sites, and more. Max 50MB.
                           </p>
                           <button className="px-6 py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full text-sm font-medium transition-colors">
@@ -271,7 +271,7 @@ export default function AnalyzePage() {
                           className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                           onKeyDown={(e) => e.key === "Enter" && handleAnalyze()}
                         />
-                        <p className="text-xs text-neutral-500 mt-3">
+                        <p className="text-[14px] md:text-[16px] text-neutral-500 mt-3">
                           Public repositories only. Uses the `main` or `master` branch. Max 50MB archive.
                         </p>
                       </div>
