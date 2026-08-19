@@ -40,6 +40,7 @@ export const metadata: Metadata = {
       "Upload your project ZIP and instantly discover which hosting platforms are compatible.",
     type: "website",
     locale: "en_US",
+    images: ["/logo.png"],
   },
   twitter: {
     card: "summary_large_image",

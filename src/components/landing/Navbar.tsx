@@ -20,8 +20,8 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
-          <div className="w-7 h-7 rounded-lg bg-white/[0.06] flex items-center justify-center border border-white/[0.08]">
-            <Scan className="w-3.5 h-3.5 text-white/80" />
+          <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center bg-white/[0.06] border border-white/[0.08]">
+            <img src="/logo.png" alt="HostWhere Logo" className="w-full h-full object-cover" />
           </div>
           <span className="font-display font-extrabold text-[19px] md:text-[22px] tracking-tight text-white">
             HostWhere

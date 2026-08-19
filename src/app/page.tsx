@@ -37,7 +37,9 @@ export default function LandingPage() {
           <div className="hero-glow" />
           
           <div className="hero-animate hero-delay-1 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-8">
-            <ScanLine className="w-3.5 h-3.5 text-primary" />
+            <div className="w-4 h-4 rounded-full overflow-hidden flex items-center justify-center">
+              <img src="/logo.png" alt="HostWhere Logo" className="w-full h-full object-cover" />
+            </div>
             <span className="text-[11px] font-medium tracking-wide uppercase text-neutral-300">
               Free & Open-Source Project Analyzer
             </span>
@@ -290,8 +292,8 @@ export default function LandingPage() {
       <footer className="border-t border-white/[0.06] py-12 px-6 relative z-10 bg-black">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-white/[0.06] flex items-center justify-center border border-white/[0.08]">
-              <ScanLine className="w-3 h-3 text-white/50" />
+            <div className="w-7 h-7 rounded-md overflow-hidden flex items-center justify-center bg-white/[0.06] border border-white/[0.08]">
+              <img src="/logo.png" alt="HostWhere Logo" className="w-full h-full object-cover" />
             </div>
             <span className="font-semibold text-sm tracking-tight text-neutral-400">
               HostWhere

@@ -1,4 +1,5 @@
 import { AnalysisResult } from "./types";
+import { getSupabaseServerClient } from "../supabase/server";
 
 export interface ResultsStore {
   storeResult(result: AnalysisResult): Promise<void>;
@@ -57,12 +58,73 @@ export class InMemoryResultsStore implements ResultsStore {
   }
 }
 
+export class SupabaseResultsStore implements ResultsStore {
+  async storeResult(result: AnalysisResult): Promise<void> {
+    const supabase = getSupabaseServerClient();
+    const expiresAt = new Date(Date.now() + TTL_MS).toISOString();
+
+    const { error } = await supabase
+      .from("analysis_results")
+      .upsert({
+        id: result.id,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        result: result as any, // Supabase expects JSON compatible types
+        expires_at: expiresAt,
+      });
+
+    if (error) {
+      console.error("Failed to store result in Supabase:", error);
+      throw new Error("Failed to store analysis result.");
+    }
+  }
+
+  async getResult(id: string): Promise<AnalysisResult | null> {
+    const supabase = getSupabaseServerClient();
+
+    const { data, error } = await supabase
+      .from("analysis_results")
+      .select("result, expires_at")
+      .eq("id", id)
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    const expiresAt = new Date(data.expires_at).getTime();
+    if (Date.now() > expiresAt) {
+      // Clean up expired result
+      await this.deleteResult(id);
+      return null;
+    }
+
+    return data.result as AnalysisResult;
+  }
+
+  async deleteResult(id: string): Promise<void> {
+    const supabase = getSupabaseServerClient();
+    await supabase.from("analysis_results").delete().eq("id", id);
+  }
+}
+
 // Factory
 export function createResultsStore(): ResultsStore {
-  const provider = process.env.RESULTS_STORE || "in-memory";
-  if (provider === "redis") {
-    throw new Error("Redis ResultsStore not implemented yet. Use RESULTS_STORE=in-memory");
+  // Use Supabase by default in production
+  let provider = process.env.RESULTS_STORE;
+  if (!provider && process.env.NODE_ENV === "production") {
+    provider = "supabase";
+  } else if (!provider) {
+    provider = "in-memory";
   }
+
+  if (provider === "supabase") {
+    return new SupabaseResultsStore();
+  }
+  
+  if (provider === "redis") {
+    throw new Error("Redis ResultsStore not implemented yet. Use RESULTS_STORE=in-memory or supabase");
+  }
+  
   return new InMemoryResultsStore();
 }
 
