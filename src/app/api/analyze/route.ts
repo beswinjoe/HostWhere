@@ -6,6 +6,7 @@ import { rateLimiter } from "@/lib/rate-limit";
 import { analytics } from "@/lib/analytics";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 // 50MB max upload
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
