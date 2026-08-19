@@ -198,6 +198,23 @@ export async function analyzeProject(files: ProjectFiles, projectName: string = 
     evaluateAzure(profile),
   ];
 
+  // Debug Output
+  if (process.env.NODE_ENV === "development") {
+    console.log(`\n=== DEBUG ANALYZER: ${projectName} ===`);
+    console.log("WEBSOCKET DETECTOR");
+    console.log("detected:", profile.usesWebSockets);
+    console.log("evidence:", JSON.stringify(websocketRes.evidence, null, 2));
+
+    console.log("\nWORKER DETECTOR");
+    console.log("detected:", profile.usesWorkers);
+    console.log("evidence:", JSON.stringify(workerRes.evidence, null, 2));
+
+    console.log("\nPERSISTENT PROCESS");
+    console.log("detected:", profile.requiresPersistentProcess);
+    console.log("evidence:", JSON.stringify(persistentRes.evidence, null, 2));
+    console.log("========================================\n");
+  }
+
   // 6. Return full result
   return {
     id: generateId(),

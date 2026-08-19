@@ -16,8 +16,6 @@ const PERSISTENT_PROCESS_DEPS = [
   "mqtt", "aedes",
   // gRPC servers (often persistent)
   "@grpc/grpc-js",
-  // Python equivalents
-  "discord.py", "python-telegram-bot", "aiogram", "slackclient",
 ];
 
 const PERSISTENT_SOURCE_PATTERNS = [
@@ -36,9 +34,9 @@ const PERSISTENT_SOURCE_PATTERNS = [
 
 export function persistentProcessDetector(files: ProjectFiles): DetectorResult {
   const evidence: Evidence[] = [];
-  let requiresPersistentProcess = false;
+  let totalConfidence = 0;
 
-  // Check dependencies
+  // 1. Check dependencies
   const pkgContent = files.get("package.json");
   if (pkgContent) {
     try {
@@ -50,11 +48,12 @@ export function persistentProcessDetector(files: ProjectFiles): DetectorResult {
 
       for (const dep of PERSISTENT_PROCESS_DEPS) {
         if (allDeps.includes(dep)) {
-          requiresPersistentProcess = true;
+          totalConfidence += 50; // Medium confidence
           evidence.push({
             file: "package.json",
             type: "dependency",
             snippet: `Persistent process dependency: ${dep}`,
+            confidence: 50,
           });
         }
       }
@@ -71,11 +70,12 @@ export function persistentProcessDetector(files: ProjectFiles): DetectorResult {
         ) {
           // A direct node execution start script implies a persistent server
           if (!startCmd.includes("next ") && !startCmd.includes("react-scripts")) {
-            requiresPersistentProcess = true;
+            totalConfidence += 90; // High confidence
             evidence.push({
               file: "package.json",
               type: "config",
               snippet: `Start script runs persistent process: "${startCmd}"`,
+              confidence: 90,
             });
           }
         }
@@ -85,35 +85,37 @@ export function persistentProcessDetector(files: ProjectFiles): DetectorResult {
     }
   }
 
-  // Check Python deps
+  // 2. Check Python deps
   const requirementsTxt = files.get("requirements.txt");
   if (requirementsTxt) {
-    for (const dep of PERSISTENT_PROCESS_DEPS) {
-      if (requirementsTxt.toLowerCase().includes(dep.toLowerCase())) {
-        requiresPersistentProcess = true;
+    const pyPersistentDeps = ["discord.py", "python-telegram-bot", "aiogram", "slackclient"];
+    for (const dep of pyPersistentDeps) {
+      const regex = new RegExp(`^${dep}(?:[>=<~].*)?$`, "im");
+      if (regex.test(requirementsTxt)) {
+        totalConfidence += 50;
         evidence.push({
           file: "requirements.txt",
           type: "dependency",
           snippet: `Persistent process dependency: ${dep}`,
+          confidence: 50,
         });
       }
     }
   }
 
-  // Check source patterns
-  let filesChecked = 0;
+  // 3. Check source patterns
+  let sourceConfidenceAdded = false;
   for (const [path, content] of files.entries()) {
-    if (filesChecked > 200) break;
-    if (!path.endsWith(".ts") && !path.endsWith(".tsx") && !path.endsWith(".js") && !path.endsWith(".jsx") && !path.endsWith(".py")) continue;
-    if (path.includes("node_modules") || path.includes("dist/")) continue;
-    filesChecked++;
-
+    if (path.match(/\.(md|mdx|txt|json|yaml|yml|toml|html|css|scss|less)$/i)) continue;
+    
     for (const { pattern, description } of PERSISTENT_SOURCE_PATTERNS) {
       if (pattern.test(content)) {
-        // Only mark as persistent if it's a bot or standalone server
-        // Next.js/React dev servers don't count
         if (!path.includes("next.config") && !path.includes("react-scripts")) {
-          evidence.push({ file: path, type: "source", snippet: description });
+          if (!sourceConfidenceAdded) {
+            totalConfidence += 40;
+            sourceConfidenceAdded = true;
+          }
+          evidence.push({ file: path, type: "source", snippet: description, confidence: 40 });
         }
         pattern.lastIndex = 0;
       } else {
@@ -122,21 +124,22 @@ export function persistentProcessDetector(files: ProjectFiles): DetectorResult {
     }
   }
 
-  // Check Procfile for worker processes
+  // 4. Check Procfile for worker processes
   const procfile = files.get("Procfile");
   if (procfile) {
     if (procfile.includes("worker:") || procfile.includes("web:")) {
-      requiresPersistentProcess = true;
+      totalConfidence += 90;
       evidence.push({
         file: "Procfile",
         type: "config",
         snippet: "Procfile defines persistent process types",
+        confidence: 90,
       });
     }
   }
 
   return {
-    requiresPersistentProcess,
+    requiresPersistentProcess: totalConfidence >= 80,
     evidence,
   };
 }

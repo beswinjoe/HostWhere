@@ -135,6 +135,7 @@ export interface Evidence {
   line?: number;
   snippet?: string;
   type: "dependency" | "config" | "source" | "file-presence" | "pattern";
+  confidence?: number;
 }
 
 export interface Requirement {
