@@ -4,6 +4,8 @@ import { analyzeProject } from "@/lib/analyzer/analyzer";
 import { resultsStore } from "@/lib/analyzer/results-store";
 import { rateLimiter } from "@/lib/rate-limit";
 import { analytics } from "@/lib/analytics";
+import { AnalysisSource } from "@/lib/analyzer/types";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -91,6 +93,8 @@ async function fetchGithubRepoBuffer(owner: string, repo: string, branch: string
 }
 
 export async function POST(request: NextRequest) {
+  let storagePathToDelete: string | null = null;
+  
   try {
     analytics.track({ name: "analysis_started" });
 
@@ -112,15 +116,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const formData = await request.formData();
-    const file = formData.get("file");
-    const githubUrl = formData.get("githubUrl");
+    const payload: AnalysisSource = await request.json();
 
     let buffer: Buffer;
     let projectName: string;
     let cacheKey: string | null = null;
 
-    if (githubUrl && typeof githubUrl === "string") {
+    if (payload.type === "github") {
+      const githubUrl = payload.url;
       analytics.track({ name: "github_analysis", properties: { repo: githubUrl } });
       
       // Handle GitHub URL with Caching
@@ -136,21 +139,36 @@ export async function POST(request: NextRequest) {
       const repoData = await fetchGithubRepoBuffer(meta.owner, meta.repo, meta.defaultBranch);
       buffer = repoData.buffer;
       projectName = sanitizeProjectName(repoData.projectName);
-    } else if (file && file instanceof File) {
+    } else if (payload.type === "storage") {
       analytics.track({ name: "zip_analysis" });
       
-      // Handle File Upload
-      if (!file.name.endsWith(".zip")) {
-        throw new Error("Only .zip files are supported.");
+      const { storagePath, projectName: pName, size } = payload;
+      
+      if (!storagePath || !storagePath.startsWith("uploads/")) {
+        throw new Error("Invalid path. File must be uploaded securely.");
       }
-      if (file.size > MAX_FILE_SIZE) {
+      if (size > MAX_FILE_SIZE) {
         throw new Error(`File too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB.`);
       }
-      const arrayBuffer = await file.arrayBuffer();
+
+      storagePathToDelete = storagePath;
+      
+      const supabase = getSupabaseServerClient();
+      const { data, error } = await supabase.storage.from("hostwhere-uploads").download(storagePath);
+      
+      if (error || !data) {
+        throw new Error("Failed to download project file from storage.");
+      }
+      
+      if (data.size > MAX_FILE_SIZE) {
+        throw new Error(`File too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB.`);
+      }
+      
+      const arrayBuffer = await data.arrayBuffer();
       buffer = Buffer.from(arrayBuffer);
-      projectName = sanitizeProjectName(file.name);
+      projectName = sanitizeProjectName(pName);
     } else {
-      throw new Error("No file or GitHub URL provided. Please upload a ZIP file or provide a public GitHub URL.");
+      throw new Error("Invalid analysis source provided.");
     }
 
     // Extract and analyze
@@ -196,5 +214,14 @@ export async function POST(request: NextRequest) {
       { error: safeMessage },
       { status: 400 } // Use 400 for bad input, hide 500 internals
     );
+  } finally {
+    if (storagePathToDelete) {
+      try {
+        const supabase = getSupabaseServerClient();
+        await supabase.storage.from("hostwhere-uploads").remove([storagePathToDelete]);
+      } catch (err) {
+        console.error("[API Error] Failed to delete file from Supabase storage:", err);
+      }
+    }
   }
 }

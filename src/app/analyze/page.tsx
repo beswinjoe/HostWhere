@@ -16,9 +16,12 @@ import {
   Cpu,
   Wifi,
   ArrowRight,
-  GitBranch
+  GitBranch,
+  CloudUpload
 } from "lucide-react";
 import { Navbar } from "@/components/landing/Navbar";
+import { getSupabaseClient } from "@/lib/supabase/client";
+import { AnalysisSource } from "@/lib/analyzer/types";
 
 const ANALYSIS_STEPS = [
   { icon: FileArchive, label: "Fetching & extracting project…", key: "extract" },
@@ -39,6 +42,7 @@ export default function AnalyzePage() {
   const [file, setFile] = useState<File | null>(null);
   const [githubUrl, setGithubUrl] = useState("");
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -84,29 +88,79 @@ export default function AnalyzePage() {
     if (mode === "zip" && !file) return;
     if (mode === "github" && !githubUrl) return;
 
-    setIsAnalyzing(true);
+    setIsUploading(true);
     setError(null);
     setCurrentStep(0);
 
-    // Animate through steps
-    const stepInterval = setInterval(() => {
-      setCurrentStep((prev) => {
-        if (prev < ANALYSIS_STEPS.length - 1) return prev + 1;
-        return prev;
-      });
-    }, 800);
+    let payload: AnalysisSource | null = null;
+    let stepInterval: NodeJS.Timeout | undefined;
 
     try {
-      const formData = new FormData();
       if (mode === "zip" && file) {
-        formData.append("file", file);
+        const supabase = getSupabaseClient();
+        // Generate random UUID using web crypto
+        const uuid = crypto.randomUUID();
+        // Sanitize file name for storage path (remove spaces and special chars)
+        const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+        const filePath = `uploads/${uuid}/${safeName}`;
+
+        // 1. Get signed URL
+        const tokenRes = await fetch("/api/upload-url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ filePath })
+        });
+        
+        if (!tokenRes.ok) {
+           const errData = await tokenRes.json().catch(() => null);
+           if (errData?.details) {
+             throw new Error(errData.details);
+           }
+           throw new Error("Failed to initialize upload.");
+        }
+        
+        const { token, path } = await tokenRes.json();
+
+        // 2. Upload using signed URL
+        const { error: uploadError } = await supabase.storage
+          .from("hostwhere-uploads")
+          .uploadToSignedUrl(path, token, file);
+
+        if (uploadError) {
+          throw new Error("Upload failed. Please try again.");
+        }
+
+        payload = {
+          type: "storage",
+          storagePath: filePath,
+          projectName: file.name,
+          size: file.size,
+        };
       } else if (mode === "github") {
-        formData.append("githubUrl", githubUrl);
+        payload = { type: "github", url: githubUrl };
+      }
+
+      setIsUploading(false);
+      setIsAnalyzing(true);
+
+      // Animate through steps
+      stepInterval = setInterval(() => {
+        setCurrentStep((prev) => {
+          if (prev < ANALYSIS_STEPS.length - 1) return prev + 1;
+          return prev;
+        });
+      }, 800);
+
+      if (!payload) {
+        throw new Error("No payload generated.");
       }
 
       const response = await fetch("/api/analyze", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       });
 
       clearInterval(stepInterval);
@@ -124,9 +178,13 @@ export default function AnalyzePage() {
       setTimeout(() => {
         router.push(`/results/${data.id}`);
       }, 500);
-    } catch {
-      clearInterval(stepInterval);
-      setError("Network error. Please check your connection and try again.");
+    } catch (err: unknown) {
+      if (typeof stepInterval !== 'undefined') {
+        clearInterval(stepInterval);
+      }
+      const errorMessage = err instanceof Error ? err.message : "Network error. Please check your connection and try again.";
+      setError(errorMessage);
+      setIsUploading(false);
       setIsAnalyzing(false);
     }
   }, [mode, file, githubUrl, router]);
@@ -293,6 +351,23 @@ export default function AnalyzePage() {
                     </div>
                   )}
                 </>
+              ) : isUploading ? (
+                /* Uploading State */
+                <div className="py-8">
+                  <div className="flex flex-col items-center justify-center text-center">
+                    <div className="relative w-20 h-20 mb-6">
+                      <div className="absolute inset-0 border-4 border-white/10 rounded-full" />
+                      <div className="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <CloudUpload className="w-8 h-8 text-primary animate-pulse" />
+                      </div>
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">Uploading project...</h3>
+                    <p className="text-sm text-neutral-400">
+                      Transferring to secure storage. This depends on your internet speed.
+                    </p>
+                  </div>
+                </div>
               ) : (
                 /* Analyzing State */
                 <div className="py-8">

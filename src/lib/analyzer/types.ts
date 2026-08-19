@@ -208,6 +208,10 @@ export interface PlatformInfo {
   category: "serverless" | "paas" | "container" | "vps";
 }
 
+export type AnalysisSource =
+  | { type: "github"; url: string }
+  | { type: "storage"; storagePath: string; projectName: string; size: number };
+
 // ── Analysis Result ───────────────────────────────────────────
 
 export interface AnalysisResult {
