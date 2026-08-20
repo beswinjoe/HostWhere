@@ -1,5 +1,6 @@
 import { AnalysisResult } from "./types";
 import { getSupabaseServerClient } from "../supabase/server";
+import { kv } from "@vercel/kv";
 
 export interface ResultsStore {
   storeResult(result: AnalysisResult): Promise<void>;
@@ -107,13 +108,37 @@ export class SupabaseResultsStore implements ResultsStore {
   }
 }
 
+export class RedisResultsStore implements ResultsStore {
+  async storeResult(result: AnalysisResult): Promise<void> {
+    // Expiration is in seconds for Upstash/Redis, TTL_MS is in ms
+    await kv.set(result.id, result, { ex: Math.floor(TTL_MS / 1000) });
+  }
+
+  async getResult(id: string): Promise<AnalysisResult | null> {
+    const result = await kv.get<AnalysisResult>(id);
+    return result || null;
+  }
+
+  async deleteResult(id: string): Promise<void> {
+    await kv.del(id);
+  }
+}
+
 // Factory
 export function createResultsStore(): ResultsStore {
-  // Use Supabase by default in production
   let provider = process.env.RESULTS_STORE;
+  
+  // Auto-detect based on available environment variables in production
   if (!provider && process.env.NODE_ENV === "production") {
-    provider = "supabase";
-  } else if (!provider) {
+    if (process.env.KV_REST_API_URL) {
+      provider = "redis";
+    } else if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      provider = "supabase";
+    }
+  }
+
+  // Fallback to in-memory if no provider determined
+  if (!provider) {
     provider = "in-memory";
   }
 
@@ -122,7 +147,7 @@ export function createResultsStore(): ResultsStore {
   }
   
   if (provider === "redis") {
-    throw new Error("Redis ResultsStore not implemented yet. Use RESULTS_STORE=in-memory or supabase");
+    return new RedisResultsStore();
   }
   
   return new InMemoryResultsStore();
