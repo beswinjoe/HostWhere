@@ -28,6 +28,7 @@ import {
   Code2,
   Info,
   Share2,
+  ArrowRight,
 } from "lucide-react";
 import { Navbar } from "@/components/landing/Navbar";
 import { ScrollReveal } from "@/components/landing/ScrollReveal";
@@ -259,13 +260,18 @@ function ProjectSummary({ profile, fileCount, projectName }: {
 
 function PlatformCard({
   platform,
+  allPlatforms,
   expanded,
   onToggle,
 }: {
   platform: PlatformCompatibility;
+  allPlatforms: PlatformCompatibility[];
   expanded: boolean;
   onToggle: () => void;
 }) {
+  const betterAlternatives = platform.status !== "compatible" 
+    ? allPlatforms.filter(p => p.score > platform.score && p.status === "compatible").slice(0, 3)
+    : [];
   return (
     <div
       className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
@@ -282,7 +288,14 @@ function PlatformCard({
             {statusIcon(platform.status)}
           </div>
           <div>
-            <div className="font-display font-bold text-[32px] md:text-[42px] tracking-[-0.03em] text-white group-hover:text-primary transition-colors leading-none mb-1 sm:mb-0">{platform.platform.name}</div>
+            <div className="flex items-center gap-3 mb-1 sm:mb-0">
+              <div className="font-display font-bold text-[32px] md:text-[42px] tracking-[-0.03em] text-white group-hover:text-primary transition-colors leading-none">{platform.platform.name}</div>
+              {platform.platform.verified && (
+                <span className="px-2 py-0.5 rounded text-[10px] font-semibold tracking-wide bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase">
+                  Verified
+                </span>
+              )}
+            </div>
             <div className="text-sm text-neutral-400 mt-1 hidden sm:block">
               {platform.platform.description}
             </div>
@@ -328,6 +341,30 @@ function PlatformCard({
               />
             </div>
           </div>
+
+          {platform.status !== "compatible" && (
+            <div className="mb-8 p-5 rounded-xl bg-white/[0.02] border border-white/5">
+              <h3 className="font-semibold text-lg text-white mb-2">Why not {platform.platform.name}?</h3>
+              <p className="text-neutral-300 leading-relaxed mb-4">{platform.why}</p>
+              
+              {betterAlternatives.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-white/5">
+                  <h4 className="text-sm font-semibold text-neutral-400 uppercase tracking-wider mb-3">Better Alternatives</h4>
+                  <div className="space-y-2">
+                    {betterAlternatives.map(alt => (
+                      <div key={alt.platform.id} className="flex items-start gap-3">
+                        <ArrowRight className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                        <div>
+                          <span className="font-semibold text-white">{alt.platform.name}</span>
+                          <span className="text-neutral-400 ml-2">— {alt.why || alt.platform.description}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-6">
@@ -666,6 +703,7 @@ export default function ResultsPage({
               <PlatformCard
                 key={p.platform.id}
                 platform={p}
+                allPlatforms={sortedPlatforms}
                 expanded={expandedPlatform === p.platform.id}
                 onToggle={() => togglePlatform(p.platform.id)}
               />

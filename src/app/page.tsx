@@ -219,12 +219,20 @@ export default function LandingPage() {
           </ScrollReveal>
 
           <ScrollReveal delay={200}>
-            <div className="flex flex-wrap justify-center gap-3 md:gap-4">
-              {['Vercel', 'Cloudflare', 'Railway', 'Render', 'Netlify', 'Fly.io', 'Docker'].map((platform) => (
+            <div className="flex flex-wrap justify-center gap-3 md:gap-4 mb-8">
+              {['Vercel', 'Cloudflare', 'Railway', 'Render', 'Netlify', 'Fly.io', 'Docker', 'Zerops'].map((platform) => (
                 <div key={platform} className="px-6 py-4 glass rounded-2xl font-semibold text-lg text-neutral-300 hover:text-white transition-colors cursor-default">
                   {platform}
                 </div>
               ))}
+            </div>
+            <div className="flex justify-center">
+              <a 
+                href="mailto:support@hostwhere.com?subject=Platform%20Request" 
+                className="text-sm text-neutral-500 hover:text-white transition-colors underline underline-offset-4 decoration-neutral-500/30 hover:decoration-white/50"
+              >
+                Don&apos;t see your hosting platform? Request a platform
+              </a>
             </div>
           </ScrollReveal>
         </section>

@@ -112,7 +112,8 @@ export type PlatformId =
   | "koyeb"
   | "aws"
   | "googlecloud"
-  | "azure";
+  | "azure"
+  | "zerops";
 
 export type CompatibilityStatus = "compatible" | "possible" | "incompatible";
 export type IssueSeverity = "blocker" | "warning";
@@ -207,6 +208,7 @@ export interface PlatformInfo {
   url: string;
   icon: string;
   category: "serverless" | "paas" | "container" | "vps";
+  verified?: boolean;
 }
 
 export type AnalysisSource =

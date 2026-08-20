@@ -28,6 +28,7 @@ import { evaluateKoyeb } from "./rules/koyeb";
 import { evaluateAWS } from "./rules/aws";
 import { evaluateGoogleCloud } from "./rules/googlecloud";
 import { evaluateAzure } from "./rules/azure";
+import { evaluateZerops } from "./rules/zerops";
 
 export async function analyzeProject(files: ProjectFiles, projectName: string = "uploaded-project"): Promise<AnalysisResult> {
   // 1. Run all detectors
@@ -196,6 +197,7 @@ export async function analyzeProject(files: ProjectFiles, projectName: string = 
     evaluateAWS(profile),
     evaluateGoogleCloud(profile),
     evaluateAzure(profile),
+    evaluateZerops(profile),
   ];
 
   // Debug Output

@@ -105,4 +105,12 @@ export const PLATFORMS: Record<string, PlatformInfo> = {
     icon: "azure",
     category: "paas",
   },
+  zerops: {
+    id: "zerops",
+    name: "Zerops",
+    description: "Developer-first PaaS designed for containerized and managed services with built-in CI/CD.",
+    url: "https://zerops.io",
+    icon: "zerops",
+    category: "paas",
+  },
 };
