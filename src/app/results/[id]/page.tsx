@@ -258,6 +258,116 @@ function ProjectSummary({ profile, fileCount, projectName }: {
   );
 }
 
+function DeploymentReadinessView({ result }: { result: AnalysisResult }) {
+  const [expandedReq, setExpandedReq] = useState<string | null>(null);
+  const dr = result.deploymentReadiness;
+
+  if (!dr) return null;
+
+  return (
+    <div className="glass rounded-2xl p-6 sm:p-8 relative overflow-hidden">
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* Readiness Checklist */}
+        <div className="flex-1">
+           <div className="flex items-center gap-2 mb-1">
+             <CheckCircle2 className="w-5 h-5 text-primary" />
+             <h2 className="text-xl font-bold">Deployment Readiness</h2>
+           </div>
+           <p className="text-neutral-400 text-sm mb-6">Based on static analysis of project configuration</p>
+           
+           <div className="flex items-center gap-4 mb-6">
+             <div className="font-display font-extrabold text-[48px] leading-none tracking-[-0.035em]">
+               {dr.score}<span className="text-[24px] text-neutral-500 font-bold tracking-normal">/100</span>
+             </div>
+             <div>
+               <div className="text-xs font-semibold uppercase tracking-wider text-primary border border-primary/20 bg-primary/10 px-2 py-1 rounded">
+                 {dr.label}
+               </div>
+             </div>
+           </div>
+
+           <div className="space-y-3">
+             {dr.items.map((item, i) => (
+               <div key={i} className="flex items-start gap-3">
+                 <div className="mt-0.5 shrink-0">
+                   {item.status === 'success' && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+                   {item.status === 'warning' && <AlertTriangle className="w-4 h-4 text-yellow-500" />}
+                   {item.status === 'error' && <XCircle className="w-4 h-4 text-red-500" />}
+                   {item.status === 'info' && <Info className="w-4 h-4 text-neutral-400" />}
+                 </div>
+                 <div>
+                   <div className="text-sm font-medium text-white">{item.label}</div>
+                   {item.description && <div className="text-xs text-neutral-400 mt-0.5 leading-relaxed">{item.description}</div>}
+                 </div>
+               </div>
+             ))}
+           </div>
+        </div>
+
+        {/* Detection Evidence */}
+        <div className="flex-1 md:border-l md:border-white/10 md:pl-8 mt-8 md:mt-0">
+          <div className="flex items-center gap-2 mb-1">
+             <Shield className="w-5 h-5 text-primary" />
+             <h2 className="text-xl font-bold">Detection Evidence</h2>
+          </div>
+          <p className="text-neutral-400 text-sm mb-6">Transparent proof for important detections</p>
+
+          <div className="space-y-3">
+            {result.profile.detectedRequirements.map((req, i) => (
+              <div key={i} className="rounded-xl bg-black/40 border border-white/5 overflow-hidden transition-colors hover:bg-white/[0.02]">
+                <button onClick={() => setExpandedReq(expandedReq === req.name ? null : req.name)} className="w-full flex items-center justify-between p-4 text-left">
+                  <div>
+                    <div className="text-sm font-semibold text-white">{req.name}</div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {req.confidence && (
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider ${
+                        req.confidence === 'High' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                        req.confidence === 'Medium' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20' :
+                        'bg-neutral-500/10 text-neutral-400 border border-neutral-500/20'
+                      }`}>
+                        {req.confidence}
+                      </span>
+                    )}
+                    <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center">
+                      {expandedReq === req.name ? <ChevronDown className="w-3.5 h-3.5 text-neutral-400" /> : <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />}
+                    </div>
+                  </div>
+                </button>
+                {expandedReq === req.name && (
+                  <div className="p-4 pt-0 border-t border-white/5 mt-2 space-y-3">
+                    <p className="text-xs text-neutral-400 bg-white/5 p-2 rounded-md">{req.description}</p>
+                    {req.evidence.length > 0 ? (
+                      <ul className="space-y-2.5 mt-3">
+                        {req.evidence.map((e, j) => (
+                          <li key={j} className="text-xs flex items-start gap-2.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary/50 shrink-0 mt-1" />
+                            <div>
+                              <div className="font-mono text-[11px] text-neutral-300 bg-black/50 px-1.5 py-0.5 rounded border border-white/5 inline-block mb-1 break-all">{e.file}</div>
+                              <div className="text-neutral-400 leading-relaxed">{e.snippet}</div>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-xs text-neutral-500 italic mt-3">No specific file evidence stored.</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+            {result.profile.detectedRequirements.length === 0 && (
+              <div className="p-6 rounded-xl border border-white/5 border-dashed text-center">
+                <p className="text-sm text-neutral-500">No complex requirements detected.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PlatformCard({
   platform,
   allPlatforms,
@@ -672,12 +782,19 @@ export default function ResultsPage({
 
         {/* Project Summary */}
         <ScrollReveal delay={100}>
-          <div className="mb-12">
+          <div className="mb-6">
             <ProjectSummary
               profile={result.profile}
               fileCount={result.fileCount}
               projectName={result.projectName}
             />
+          </div>
+        </ScrollReveal>
+
+        {/* Deployment Readiness */}
+        <ScrollReveal delay={125}>
+          <div className="mb-12">
+            <DeploymentReadinessView result={result} />
           </div>
         </ScrollReveal>
 

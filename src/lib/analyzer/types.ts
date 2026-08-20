@@ -144,6 +144,7 @@ export interface Requirement {
   description: string;
   critical: boolean;
   evidence: Evidence[];
+  confidence?: "High" | "Medium" | "Low";
 }
 
 // ── Project Profile ───────────────────────────────────────────
@@ -215,12 +216,25 @@ export type AnalysisSource =
   | { type: "github"; url: string }
   | { type: "storage"; storagePath: string; projectName: string; size: number };
 
+export interface DeploymentChecklist {
+  label: string;
+  status: "success" | "warning" | "error" | "info";
+  description?: string;
+}
+
+export interface DeploymentReadiness {
+  score: number;
+  label: string;
+  items: DeploymentChecklist[];
+}
+
 // ── Analysis Result ───────────────────────────────────────────
 
 export interface AnalysisResult {
   id: string;
   profile: ProjectProfile;
   platforms: PlatformCompatibility[];
+  deploymentReadiness: DeploymentReadiness;
   analyzedAt: string;
   fileCount: number;
   projectName: string;

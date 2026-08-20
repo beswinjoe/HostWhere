@@ -1,4 +1,11 @@
-import { ProjectFiles, ProjectProfile, PlatformCompatibility, AnalysisResult, Requirement } from "./types";
+import { 
+  ProjectFiles, 
+  AnalysisResult, 
+  ProjectProfile, 
+  Requirement,
+  Evidence,
+  PlatformCompatibility
+} from "./types";
 
 // Detectors
 import { frameworkDetector } from "./detectors/frameworkDetector";
@@ -47,58 +54,77 @@ export async function analyzeProject(files: ProjectFiles, projectName: string = 
 
   // 2. Compile detected requirements
   const detectedRequirements: Requirement[] = [];
+
+  const calcConf = (evidence: Evidence[]): "High" | "Medium" | "Low" => {
+    const sum = evidence.reduce((acc, e) => acc + (e.confidence || 0), 0);
+    if (sum >= 80) return "High";
+    if (sum >= 50) return "Medium";
+    return "Low";
+  };
   
   if (databaseRes.databases?.length) {
+    const ev = databaseRes.evidence || [];
     detectedRequirements.push({
       name: "Database Connection",
       description: `Connects to: ${databaseRes.databases.join(", ")}`,
       critical: true,
-      evidence: databaseRes.evidence || [],
+      evidence: ev,
+      confidence: calcConf(ev),
     });
   }
 
   if (persistentRes.requiresPersistentProcess) {
+    const ev = persistentRes.evidence || [];
     detectedRequirements.push({
       name: "Persistent Process",
       description: "Requires a continuously running server or daemon.",
       critical: true,
-      evidence: persistentRes.evidence || [],
+      evidence: ev,
+      confidence: calcConf(ev),
     });
   }
 
   if (websocketRes.usesWebSockets) {
+    const ev = websocketRes.evidence || [];
     detectedRequirements.push({
       name: "WebSockets",
       description: "Uses persistent WebSocket connections.",
       critical: false, // Not always critical depending on platform
-      evidence: websocketRes.evidence || [],
+      evidence: ev,
+      confidence: calcConf(ev),
     });
   }
 
   if (workerRes.usesWorkers) {
+    const ev = workerRes.evidence || [];
     detectedRequirements.push({
       name: "Background Workers",
       description: "Uses background queues or worker processes.",
       critical: true,
-      evidence: workerRes.evidence || [],
+      evidence: ev,
+      confidence: calcConf(ev),
     });
   }
 
   if (dockerRes.usesDocker) {
+    const ev = dockerRes.evidence || [];
     detectedRequirements.push({
       name: "Docker",
       description: "Provides a Dockerfile for containerized deployment.",
       critical: false,
-      evidence: dockerRes.evidence || [],
+      evidence: ev,
+      confidence: calcConf(ev),
     });
   }
 
   if (cronRes.usesCron) {
+    const ev = cronRes.evidence || [];
     detectedRequirements.push({
       name: "Cron / Scheduled Jobs",
       description: "Runs periodic scheduled tasks.",
       critical: false,
-      evidence: cronRes.evidence || [],
+      evidence: ev,
+      confidence: calcConf(ev),
     });
   }
 
@@ -217,11 +243,82 @@ export async function analyzeProject(files: ProjectFiles, projectName: string = 
     console.log("========================================\n");
   }
 
-  // 6. Return full result
+  // 6. Compute Deployment Readiness
+  let drScore = 100;
+  const drItems: { label: string; status: "success" | "warning" | "error" | "info"; description?: string }[] = [];
+
+  if (profile.framework !== "unknown" && profile.framework !== null) {
+    drItems.push({ label: "Framework detected", status: "success", description: `Found ${profile.framework}` });
+  } else if (profile.runtime !== "unknown") {
+    drItems.push({ label: "Runtime detected", status: "success", description: `Found ${profile.runtime}` });
+  } else {
+    drItems.push({ label: "Framework/Runtime", status: "error", description: "Could not identify standard framework or runtime." });
+    drScore -= 20;
+  }
+
+  if (profile.buildCommand) {
+    drItems.push({ label: "Build configuration detected", status: "success", description: `Build command: ${profile.buildCommand}` });
+  } else if (profile.framework !== "unknown" && profile.framework !== null) {
+    drItems.push({ label: "Build configuration", status: "info", description: "Default framework build will be used." });
+  }
+
+  if (profile.startCommand) {
+    drItems.push({ label: "Start command detected", status: "success", description: `Start command: ${profile.startCommand}` });
+  } else if (profile.staticSite) {
+    drItems.push({ label: "Start command", status: "info", description: "Static site does not require a start command." });
+  } else if (profile.requiresPersistentProcess) {
+    drItems.push({ label: "Start command missing", status: "warning", description: "A start command is highly recommended for persistent processes." });
+    drScore -= 5;
+  }
+
+  if (profile.usesDocker) {
+    drItems.push({ label: "Dockerfile detected", status: "success" });
+  }
+
+  if (profile.environmentVariables.length > 0) {
+    drItems.push({ label: "Environment variables required", status: "warning", description: `Detected ${profile.environmentVariables.length} missing variables.` });
+    drScore -= 5;
+  }
+
+  if (profile.databases.length > 0) {
+    drItems.push({ label: "Database detected", status: "success", description: `Found: ${profile.databases.join(", ")}` });
+  }
+
+  if (profile.requiresPersistentProcess) {
+    drItems.push({ label: "Persistent process detected", status: "warning", description: "Requires specialized hosting platform." });
+    drScore -= 5;
+  }
+
+  if (profile.usesWebSockets) {
+    drItems.push({ label: "WebSockets detected", status: "warning", description: "Requires real-time connection support." });
+    drScore -= 5;
+  }
+
+  if (profile.usesWorkers) {
+    drItems.push({ label: "Background worker detected", status: "warning", description: "Requires worker instance support." });
+    drScore -= 5;
+  }
+
+  if (profile.usesCron) {
+    drItems.push({ label: "Cron/scheduled job detected", status: "info" });
+  }
+
+  let drLabel = "Ready for deployment";
+  if (drScore < 80) drLabel = "Action Required";
+  else if (drScore < 100) drLabel = "Ready with minor configuration";
+
+  const deploymentReadiness = {
+    score: drScore,
+    label: drLabel,
+    items: drItems,
+  };
+
+  // 7. Return full result
   return {
     id: generateId(),
     profile,
     platforms: platforms.sort((a, b) => b.score - a.score), // Sort by score descending
+    deploymentReadiness,
     analyzedAt: new Date().toISOString(),
     fileCount: files.size,
     projectName,
