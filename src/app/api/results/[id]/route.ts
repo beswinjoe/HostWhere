@@ -1,6 +1,8 @@
 import { NextRequest } from "next/server";
 import { resultsStore } from "@/lib/analyzer/results-store";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
