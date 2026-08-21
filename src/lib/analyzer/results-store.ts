@@ -11,7 +11,7 @@ export interface ResultsStore {
 // In-Memory Results Store
 // ─────────────────────────────────────────────────────────────
 
-const TTL_MS = 60 * 60 * 1000; // 1 hour
+const TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 const MAX_ENTRIES = 100;
 
 interface CacheEntry {
