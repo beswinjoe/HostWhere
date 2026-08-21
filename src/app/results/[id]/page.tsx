@@ -637,7 +637,9 @@ export default function ResultsPage({
   useEffect(() => {
     async function fetchResult() {
       try {
-        const response = await fetch(`/api/results/${id}`);
+        // Use a cache-busting query parameter to ensure we bypass aggressive browser/CDN caches
+        const timestamp = Date.now();
+        const response = await fetch(`/api/results/${id}?t=${timestamp}`);
         const data = await response.json();
 
         if (!response.ok) {
