@@ -143,23 +143,32 @@ function runtimeLabel(rt: string): string {
 // Sub-components
 // ─────────────────────────────────────────────────────────────
 
-function ProjectSummary({ profile, fileCount, projectName }: {
-  profile: ProjectProfile;
-  fileCount: number;
+function ProjectSummary({ 
+  profile, 
+  fileCount, 
+  projectName,
+  resultId
+}: { 
+  profile: ProjectProfile; 
+  fileCount: number; 
   projectName: string;
+  resultId: string;
 }) {
   const [copied, setCopied] = useState(false);
 
   const handleShare = useCallback(async () => {
     try {
+      const resultUrl = `${window.location.origin}/results/${resultId}`;
+      const shareText = `Check out the hosting compatibility report for ${projectName}`;
+
       if (navigator.share) {
         await navigator.share({
-          title: `HostWhere Analysis: ${projectName}`,
-          text: `Check out the hosting compatibility report for ${projectName}`,
-          url: window.location.href,
+          title: "HostWhere Report",
+          text: shareText,
+          url: resultUrl,
         });
       } else {
-        await navigator.clipboard.writeText(window.location.href);
+        await navigator.clipboard.writeText(resultUrl);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       }
@@ -789,6 +798,7 @@ export default function ResultsPage({
               profile={result.profile}
               fileCount={result.fileCount}
               projectName={result.projectName}
+              resultId={result.id}
             />
           </div>
         </ScrollReveal>
