@@ -164,7 +164,6 @@ function ProjectSummary({
       if (navigator.share) {
         await navigator.share({
           title: "HostWhere Report",
-          text: shareText,
           url: resultUrl,
         });
       } else {
