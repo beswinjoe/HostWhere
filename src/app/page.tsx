@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { Navbar } from "@/components/landing/Navbar";
 import { ScrollReveal } from "@/components/landing/ScrollReveal";
+import { HomepageFeaturedProjects } from "@/components/featured/HomepageFeaturedProjects";
+import { RecentlyAnalyzed } from "@/components/landing/RecentlyAnalyzed";
 
 export default function LandingPage() {
   return (
@@ -69,6 +71,9 @@ export default function LandingPage() {
             </a>
           </div>
         </section>
+
+        {/* ─── Featured Projects ───────────────────────────────────────── */}
+        <HomepageFeaturedProjects />
 
         {/* ─── Product Preview Section ─────────────────────────────────── */}
         <ScrollReveal className="px-6 mb-40">
@@ -270,6 +275,9 @@ export default function LandingPage() {
             ))}
           </div>
         </section>
+        
+        {/* ─── Recently Analyzed Projects ──────────────────────────────── */}
+        <RecentlyAnalyzed />
 
         {/* ─── Final CTA ───────────────────────────────────────────────── */}
         <section className="px-6 max-w-4xl mx-auto">

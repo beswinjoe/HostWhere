@@ -3,6 +3,7 @@ import { extractZipSafely, sanitizeProjectName } from "@/lib/analyzer/zip-handle
 import { analyzeProject } from "@/lib/analyzer/analyzer";
 import { resultsStore } from "@/lib/analyzer/results-store";
 import { rateLimiter } from "@/lib/rate-limit";
+import { createClient } from "@/lib/supabase/auth-server";
 import { analytics } from "@/lib/analytics";
 import { AnalysisSource } from "@/lib/analyzer/types";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
@@ -187,6 +188,42 @@ export async function POST(request: NextRequest) {
 
     // Store in cache for retrieval
     await resultsStore.storeResult(result);
+
+    // Save to user history if authenticated
+    try {
+      const authSupabase = await createClient();
+      const { data: { user } } = await authSupabase.auth.getUser();
+
+      if (user) {
+        const isPublic = payload.type === "github"; // Only GitHub is allowed to be public
+        
+        // Basic compatibility summary extraction
+        const compatibility_summary = {
+          compatible: result.platforms.filter((p) => p.status === "compatible").length,
+          possible: result.platforms.filter((p) => p.status === "possible").length,
+          incompatible: result.platforms.filter((p) => p.status === "incompatible").length,
+        };
+
+        const { error: insertError } = await authSupabase
+          .from("user_analyses")
+          .insert({
+            user_id: user.id,
+            analysis_id: result.id,
+            project_name: result.projectName,
+            source_type: payload.type,
+            github_url: payload.type === "github" ? payload.url : null,
+            framework: result.profile.framework || "unknown",
+            compatibility_summary,
+            is_public: isPublic,
+          });
+          
+        if (insertError) {
+          console.error("[API Error] Failed to save user analysis:", insertError);
+        }
+      }
+    } catch (err) {
+      console.error("[API Error] Auth check failed during analysis:", err);
+    }
 
     analytics.trackAnalysisCompleted({
       language: result.profile.language,

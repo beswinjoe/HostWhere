@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { Navbar } from "@/components/landing/Navbar";
 import { ScrollReveal } from "@/components/landing/ScrollReveal";
+import { FeatureProjectCTA } from "@/components/featured/FeatureProjectCTA";
 import type {
   AnalysisResult,
   PlatformCompatibility,
@@ -746,8 +747,30 @@ export default function ResultsPage({
 
       <main className="relative z-10 pt-32 pb-24 px-6 max-w-5xl mx-auto w-full">
         
-        {/* Status Summary Cards */}
+        {/* Project Summary */}
         <ScrollReveal>
+          <div className="mb-6">
+            <ProjectSummary
+              profile={result.profile}
+              fileCount={result.fileCount}
+              projectName={result.projectName}
+              resultId={result.id}
+            />
+          </div>
+        </ScrollReveal>
+
+        {/* Feature This Project CTA */}
+        <ScrollReveal delay={50}>
+          <FeatureProjectCTA 
+            resultId={result.id} 
+            projectName={result.projectName} 
+            framework={result.profile.framework || "unknown"}
+            hostName={sortedPlatforms[0]?.platform.name || "unknown"}
+          />
+        </ScrollReveal>
+
+        {/* Status Summary Cards */}
+        <ScrollReveal delay={100}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div className="glass p-6 rounded-2xl border-emerald-500/20 relative overflow-hidden group">
               <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors" />
@@ -787,18 +810,6 @@ export default function ResultsPage({
                 </div>
               </div>
             </div>
-          </div>
-        </ScrollReveal>
-
-        {/* Project Summary */}
-        <ScrollReveal delay={100}>
-          <div className="mb-6">
-            <ProjectSummary
-              profile={result.profile}
-              fileCount={result.fileCount}
-              projectName={result.projectName}
-              resultId={result.id}
-            />
           </div>
         </ScrollReveal>
 
