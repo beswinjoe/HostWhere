@@ -123,11 +123,6 @@ export async function POST(request: NextRequest) {
     const origin = request.headers.get("origin") || request.headers.get("host") || "";
     const baseUrl = origin.startsWith("http") ? origin : `https://${origin}`;
 
-    let planProductId: string | undefined = undefined;
-    if (body.plan === "boost") planProductId = process.env.DODO_PAYMENTS_BOOST_PRODUCT_ID;
-    if (body.plan === "featured") planProductId = process.env.DODO_PAYMENTS_FEATURED_PRODUCT_ID;
-    if (body.plan === "spotlight") planProductId = process.env.DODO_PAYMENTS_SPOTLIGHT_PRODUCT_ID;
-
     const checkoutResult = await createCheckoutSession({
       amountCents: amountCents,
       metadata: {
@@ -141,7 +136,7 @@ export async function POST(request: NextRequest) {
         referred_user_id: user?.id || "",
       },
       returnUrl: `${baseUrl}/featured/success?payment_id=${payment.id}&project_id=${project.id}`,
-    }, planProductId);
+    });
 
     return Response.json({
       checkout_url: checkoutResult.checkout_url,
