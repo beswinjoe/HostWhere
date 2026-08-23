@@ -4,13 +4,16 @@ import {
   ArrowDown,
   ArrowUpRight,
   CheckCircle2,
+  XCircle,
   Zap,
   Star,
   Crown,
   Share2,
   BarChart,
   Globe,
-  Coins
+  Coins,
+  UserCircle,
+  Layers
 } from "lucide-react";
 import { Navbar } from "@/components/landing/Navbar";
 import { ScrollReveal } from "@/components/landing/ScrollReveal";
@@ -150,12 +153,15 @@ export default function LandingPage() {
                 <p className="text-neutral-600 mb-8 flex-grow">
                   Get your project featured on HostWhere for 7 days. Perfect for quick visibility.
                 </p>
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-3 mb-8">
                   <li className="flex items-center gap-3 text-sm text-neutral-700">
-                    <CheckCircle2 className="w-4 h-4 text-neutral-400" /> Priority Level 1
+                    <CheckCircle2 className="w-4 h-4 text-neutral-400 shrink-0" /> Priority Level 1
                   </li>
                   <li className="flex items-center gap-3 text-sm text-neutral-700">
-                    <CheckCircle2 className="w-4 h-4 text-neutral-400" /> Appears on Leaderboard
+                    <CheckCircle2 className="w-4 h-4 text-neutral-400 shrink-0" /> Appears on Leaderboard
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-500">
+                    <XCircle className="w-4 h-4 text-red-500 shrink-0" /> Editable Project Profile
                   </li>
                 </ul>
                 <Link href="/analyze" className="mt-auto">
@@ -183,15 +189,30 @@ export default function LandingPage() {
                 <p className="text-neutral-600 mb-8 flex-grow">
                   Get higher visibility on HostWhere for 14 days. Our most popular option for serious creators.
                 </p>
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-2 mb-8">
                   <li className="flex items-center gap-3 text-sm text-neutral-700">
-                    <CheckCircle2 className="w-4 h-4 text-amber-500" /> Priority Level 2
+                    <CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /> Priority Level 2
                   </li>
                   <li className="flex items-center gap-3 text-sm text-neutral-700">
-                    <CheckCircle2 className="w-4 h-4 text-amber-500" /> Higher Leaderboard Ranking
+                    <CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /> Higher Leaderboard Ranking
                   </li>
                   <li className="flex items-center gap-3 text-sm text-neutral-700">
-                    <CheckCircle2 className="w-4 h-4 text-amber-500" /> Homepage Eligible
+                    <CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /> Homepage Eligible
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-700">
+                    <CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /> Editable Project Profile
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-600 pl-2">
+                    <Globe className="w-3.5 h-3.5 text-amber-500 shrink-0" /> Add Website &amp; Live Demo Links
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-600 pl-2">
+                    <UserCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" /> Add Creator / Company Name
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-600 pl-2">
+                    <Layers className="w-3.5 h-3.5 text-amber-500 shrink-0" /> Add Category &amp; Project Details
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-600 pl-2">
+                    <Share2 className="w-3.5 h-3.5 text-amber-500 shrink-0" /> Add Social Media Links
                   </li>
                 </ul>
                 <Link href="/analyze" className="mt-auto">
@@ -216,15 +237,30 @@ export default function LandingPage() {
                 <p className="text-neutral-600 mb-8 flex-grow">
                   Premium visibility and top placement on HostWhere for 30 days. Maximize your project&apos;s reach.
                 </p>
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-2 mb-8">
                   <li className="flex items-center gap-3 text-sm text-neutral-700">
-                    <CheckCircle2 className="w-4 h-4 text-purple-600" /> Priority Level 3 (Maximum)
+                    <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" /> Priority Level 3 (Maximum)
                   </li>
                   <li className="flex items-center gap-3 text-sm text-neutral-700">
-                    <CheckCircle2 className="w-4 h-4 text-purple-600" /> Top Leaderboard Ranking
+                    <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" /> Top Leaderboard Ranking
                   </li>
                   <li className="flex items-center gap-3 text-sm text-neutral-700">
-                    <CheckCircle2 className="w-4 h-4 text-purple-600" /> Priority Homepage Placement
+                    <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" /> Priority Homepage Placement
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-700">
+                    <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" /> Premium Editable Project Profile
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-600 pl-2">
+                    <Globe className="w-3.5 h-3.5 text-purple-600 shrink-0" /> Add Website &amp; Live Demo Links
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-600 pl-2">
+                    <UserCircle className="w-3.5 h-3.5 text-purple-600 shrink-0" /> Add Creator / Company Name
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-600 pl-2">
+                    <Layers className="w-3.5 h-3.5 text-purple-600 shrink-0" /> Add Category &amp; Project Details
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-600 pl-2">
+                    <Share2 className="w-3.5 h-3.5 text-purple-600 shrink-0" /> Add Social Media Links
                   </li>
                 </ul>
                 <Link href="/analyze" className="mt-auto">
