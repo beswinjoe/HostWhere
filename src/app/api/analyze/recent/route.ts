@@ -1,15 +1,24 @@
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/auth-server";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const supabase = getSupabaseServerClient();
+    const supabase = await createClient();
     
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return Response.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
     const { data, error } = await supabase
       .from("user_analyses")
-      .select("*, profiles(username)")
-      .eq("is_public", true)
+      .select("id, repository_url, project_name, description, framework, recommended_host, status, created_at")
+      .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(6);
 
