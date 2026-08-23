@@ -60,16 +60,16 @@ export function RecentlyAnalyzed() {
       <ScrollReveal>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <h2 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight mb-3 flex items-center gap-3">
-              <Clock className="w-8 h-8 text-primary" />
+            <h2 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight mb-3 flex items-center gap-3 text-neutral-900">
+              <Clock className="w-8 h-8 text-blue-600" />
               Recently Analyzed
             </h2>
-            <p className="text-neutral-400 text-lg">
+            <p className="text-neutral-500 text-lg">
               See what the community is building and where they are deploying.
             </p>
           </div>
           <Link href="/analyze">
-            <button className="flex items-center gap-2 text-primary hover:text-blue-400 font-medium transition-colors group">
+            <button className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors group">
               Analyze Your Project
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
@@ -83,13 +83,13 @@ export function RecentlyAnalyzed() {
           Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="glass p-5 rounded-2xl h-[180px] animate-pulse flex flex-col justify-between">
               <div>
-                <div className="w-1/2 h-5 bg-white/5 rounded-md mb-3" />
-                <div className="w-3/4 h-4 bg-white/5 rounded-md mb-2" />
-                <div className="w-1/3 h-4 bg-white/5 rounded-md" />
+                <div className="w-1/2 h-5 bg-neutral-100 rounded-md mb-3" />
+                <div className="w-3/4 h-4 bg-neutral-100 rounded-md mb-2" />
+                <div className="w-1/3 h-4 bg-neutral-100 rounded-md" />
               </div>
               <div className="flex justify-between items-center mt-4">
-                <div className="w-16 h-6 bg-white/5 rounded-full" />
-                <div className="w-24 h-4 bg-white/5 rounded-md" />
+                <div className="w-16 h-6 bg-neutral-100 rounded-full" />
+                <div className="w-24 h-4 bg-neutral-100 rounded-md" />
               </div>
             </div>
           ))
@@ -101,9 +101,9 @@ export function RecentlyAnalyzed() {
             return (
               <ScrollReveal key={item.id} delay={i * 50}>
                 <Link href={`/results/${item.analysis_id}`}>
-                  <div className="glass p-5 rounded-2xl border border-white/5 hover:border-primary/30 transition-all flex flex-col h-full group hover:bg-white/[0.04]">
+                  <div className="glass p-5 rounded-2xl border border-neutral-200 hover:border-blue-300 transition-all flex flex-col h-full group hover:bg-neutral-50 shadow-sm hover:shadow-md">
                     <div className="flex-grow mb-4">
-                      <h3 className="font-bold text-white text-lg tracking-tight mb-1 truncate group-hover:text-primary transition-colors">
+                      <h3 className="font-bold text-neutral-900 text-lg tracking-tight mb-1 truncate group-hover:text-blue-700 transition-colors">
                         {item.project_name}
                       </h3>
                       <p className="text-xs text-neutral-500 font-mono truncate">
@@ -113,18 +113,18 @@ export function RecentlyAnalyzed() {
 
                     <div className="flex flex-col gap-3">
                       <div className="flex flex-wrap gap-2">
-                        <span className="px-2 py-1 rounded-md bg-white/5 text-xs text-neutral-300 font-medium flex items-center gap-1.5 border border-white/5">
+                        <span className="px-2 py-1 rounded-md bg-neutral-100 text-xs text-neutral-700 font-medium flex items-center gap-1.5 border border-neutral-200">
                           <Code2 className="w-3 h-3" />
                           {item.framework || "unknown"}
                         </span>
                         
-                        <span className="px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 border bg-white/5 text-neutral-300 border-white/10">
+                        <span className="px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 border bg-green-50 text-green-700 border-green-200">
                            {compSummary.compatible} Compatible
                         </span>
                       </div>
                       
-                      <div className="flex items-center justify-between text-xs text-neutral-500 border-t border-white/5 pt-3 mt-1">
-                        <span className="flex items-center gap-1.5 text-neutral-400">
+                      <div className="flex items-center justify-between text-xs text-neutral-500 border-t border-neutral-200 pt-3 mt-1">
+                        <span className="flex items-center gap-1.5 text-neutral-600">
                           <UserCircle className="w-3.5 h-3.5" />
                           {item.profiles?.username || "unknown"}
                         </span>

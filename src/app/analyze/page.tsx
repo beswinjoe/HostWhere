@@ -196,11 +196,11 @@ export default function AnalyzePage() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-black text-white selection:bg-primary/30 relative overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-white text-neutral-900 selection:bg-blue-100 relative overflow-hidden">
       <Navbar />
 
-      <div className="fixed inset-0 bg-grid z-0 pointer-events-none opacity-40" />
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none z-0" />
+      <div className="fixed inset-0 bg-grid z-0 pointer-events-none opacity-100" />
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-blue-50/50 blur-[120px] rounded-full pointer-events-none z-0" />
 
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-24">
         <div className="w-full max-w-xl hero-animate">
@@ -209,26 +209,26 @@ export default function AnalyzePage() {
             <h1 className="font-display text-[48px] md:text-[64px] font-extrabold tracking-[-0.035em] mb-4 leading-tight">
               Analyze your project
             </h1>
-            <p className="text-[18px] md:text-[20px] text-neutral-400 font-medium">
+            <p className="text-[18px] md:text-[20px] text-neutral-600 font-medium">
               Upload a ZIP or provide a public GitHub URL to discover where it can run.
             </p>
           </div>
 
-          <div className="glass p-2 sm:p-4 rounded-3xl relative shadow-2xl">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+          <div className="glass p-2 sm:p-4 rounded-3xl relative shadow-xl">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-blue-300 to-transparent" />
             
-            <div className="bg-black/80 rounded-2xl p-6 sm:p-10 border border-white/10 relative overflow-hidden">
+            <div className="bg-white/80 rounded-2xl p-6 sm:p-10 border border-neutral-200 relative overflow-hidden">
               
               {!isAnalyzing ? (
                 <>
                   {/* Mode Toggle */}
-                  <div className="flex p-1 bg-white/5 rounded-xl mb-8 border border-white/5">
+                  <div className="flex p-1 bg-neutral-100 rounded-xl mb-8 border border-neutral-200">
                     <button
                       onClick={() => { setMode("zip"); setError(null); }}
                       className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg transition-all ${
                         mode === "zip" 
-                          ? "bg-white/10 text-white shadow-sm" 
-                          : "text-neutral-500 hover:text-neutral-300"
+                          ? "bg-white text-neutral-900 shadow-sm" 
+                          : "text-neutral-500 hover:text-neutral-700"
                       }`}
                     >
                       <Upload className="w-4 h-4" />
@@ -238,8 +238,8 @@ export default function AnalyzePage() {
                       onClick={() => { setMode("github"); setError(null); }}
                       className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg transition-all ${
                         mode === "github" 
-                          ? "bg-white/10 text-white shadow-sm" 
-                          : "text-neutral-500 hover:text-neutral-300"
+                          ? "bg-white text-neutral-900 shadow-sm" 
+                          : "text-neutral-500 hover:text-neutral-700"
                       }`}
                     >
                       <GitBranch className="w-4 h-4" />
@@ -268,26 +268,26 @@ export default function AnalyzePage() {
                           onDrop={handleDrop}
                           onClick={() => fileInputRef.current?.click()}
                         >
-                          <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-6 shadow-inner">
-                            <Upload className="w-8 h-8 text-neutral-400" />
+                          <div className="w-16 h-16 rounded-2xl bg-neutral-100 border border-neutral-200 flex items-center justify-center mb-6 shadow-inner">
+                            <Upload className="w-8 h-8 text-neutral-500" />
                           </div>
                           <h3 className="text-lg font-semibold mb-2">Drop your project ZIP</h3>
                           <p className="text-[14px] md:text-[16px] text-neutral-500 mb-6 max-w-xs">
                             Supports Next.js, Node, Python, static sites, and more. Max 50MB.
                           </p>
-                          <button className="px-6 py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full text-sm font-medium transition-colors">
+                          <button className="px-6 py-2.5 bg-white hover:bg-neutral-50 border border-neutral-200 rounded-full text-sm font-medium transition-colors text-neutral-700 shadow-sm">
                             Browse Files
                           </button>
                         </div>
                       ) : (
                         <div className="flex flex-col items-center">
-                          <div className="w-full p-4 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between mb-8">
+                          <div className="w-full p-4 bg-neutral-50 border border-neutral-200 rounded-xl flex items-center justify-between mb-8">
                             <div className="flex items-center gap-3 overflow-hidden">
-                              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                                <FileArchive className="w-5 h-5 text-primary" />
+                              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
+                                <FileArchive className="w-5 h-5 text-blue-600" />
                               </div>
                               <div className="overflow-hidden">
-                                <p className="font-medium text-sm text-white truncate">{file.name}</p>
+                                <p className="font-medium text-sm text-neutral-900 truncate">{file.name}</p>
                                 <p className="text-xs text-neutral-500 mt-0.5">
                                   {(file.size / 1024 / 1024).toFixed(2)} MB
                                 </p>
@@ -295,7 +295,7 @@ export default function AnalyzePage() {
                             </div>
                             <button
                               onClick={handleRemoveFile}
-                              className="p-2 hover:bg-white/10 rounded-lg transition-colors text-neutral-400 hover:text-white shrink-0"
+                              className="p-2 hover:bg-neutral-200 rounded-lg transition-colors text-neutral-500 hover:text-neutral-900 shrink-0"
                               aria-label="Remove file"
                             >
                               <X className="w-4 h-4" />
@@ -304,7 +304,7 @@ export default function AnalyzePage() {
 
                           <button
                             onClick={handleAnalyze}
-                            className="cta-glow w-full flex items-center justify-center gap-2 px-8 py-4 bg-white text-black hover:bg-neutral-200 rounded-full font-bold text-lg transition-all"
+                            className="cta-glow w-full flex items-center justify-center gap-2 px-8 py-4 bg-blue-600 text-white hover:bg-blue-700 shadow-sm rounded-full font-bold text-lg transition-all"
                           >
                             Start Analysis
                           </button>
@@ -315,7 +315,7 @@ export default function AnalyzePage() {
                     /* GITHUB MODE */
                     <div className="flex flex-col items-center">
                       <div className="w-full mb-8">
-                        <label className="block text-sm font-medium text-neutral-300 mb-2">
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
                           Repository URL
                         </label>
                         <input
@@ -326,7 +326,7 @@ export default function AnalyzePage() {
                             setGithubUrl(e.target.value);
                             setError(null);
                           }}
-                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                          className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm"
                           onKeyDown={(e) => e.key === "Enter" && handleAnalyze()}
                         />
                         <p className="text-[14px] md:text-[16px] text-neutral-500 mt-3">
@@ -337,7 +337,7 @@ export default function AnalyzePage() {
                       <button
                         onClick={handleAnalyze}
                         disabled={!githubUrl}
-                        className="cta-glow disabled:opacity-50 disabled:pointer-events-none disabled:shadow-none w-full flex items-center justify-center gap-2 px-8 py-4 bg-white text-black hover:bg-neutral-200 rounded-full font-bold text-lg transition-all"
+                        className="cta-glow disabled:opacity-50 disabled:pointer-events-none disabled:shadow-none w-full flex items-center justify-center gap-2 px-8 py-4 bg-blue-600 text-white hover:bg-blue-700 shadow-sm rounded-full font-bold text-lg transition-all"
                       >
                         Start Analysis
                         <ArrowRight className="w-5 h-5" />
@@ -346,7 +346,7 @@ export default function AnalyzePage() {
                   )}
 
                   {error && (
-                    <div className="mt-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-xl text-center">
+                    <div className="mt-6 p-4 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl text-center">
                       {error}
                     </div>
                   )}
@@ -356,14 +356,14 @@ export default function AnalyzePage() {
                 <div className="py-8">
                   <div className="flex flex-col items-center justify-center text-center">
                     <div className="relative w-20 h-20 mb-6">
-                      <div className="absolute inset-0 border-4 border-white/10 rounded-full" />
-                      <div className="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin" />
+                      <div className="absolute inset-0 border-4 border-neutral-200 rounded-full" />
+                      <div className="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin" />
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <CloudUpload className="w-8 h-8 text-primary animate-pulse" />
+                        <CloudUpload className="w-8 h-8 text-blue-600 animate-pulse" />
                       </div>
                     </div>
-                    <h3 className="text-xl font-bold mb-2">Uploading project...</h3>
-                    <p className="text-sm text-neutral-400">
+                    <h3 className="text-xl font-bold text-neutral-900 mb-2">Uploading project...</h3>
+                    <p className="text-sm text-neutral-500">
                       Transferring to secure storage. This depends on your internet speed.
                     </p>
                   </div>
@@ -373,14 +373,14 @@ export default function AnalyzePage() {
                 <div className="py-8">
                   <div className="flex flex-col items-center justify-center text-center mb-10">
                     <div className="relative w-20 h-20 mb-6">
-                      <div className="absolute inset-0 border-4 border-white/10 rounded-full" />
-                      <div className="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin" />
+                      <div className="absolute inset-0 border-4 border-neutral-200 rounded-full" />
+                      <div className="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin" />
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <FileCode2 className="w-8 h-8 text-primary animate-pulse" />
+                        <FileCode2 className="w-8 h-8 text-blue-600 animate-pulse" />
                       </div>
                     </div>
-                    <h3 className="text-xl font-bold mb-2">Analyzing your project</h3>
-                    <p className="text-sm text-neutral-400">
+                    <h3 className="text-xl font-bold text-neutral-900 mb-2">Analyzing your project</h3>
+                    <p className="text-sm text-neutral-500">
                       This usually takes just a few seconds
                     </p>
                   </div>
@@ -399,10 +399,10 @@ export default function AnalyzePage() {
                         >
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors ${
                             isPast 
-                              ? "bg-emerald-500/10 text-emerald-500" 
+                              ? "bg-green-50 text-green-600" 
                               : isActive 
-                                ? "bg-primary/20 text-primary" 
-                                : "bg-white/5 text-neutral-500"
+                                ? "bg-blue-100 text-blue-600" 
+                                : "bg-neutral-100 text-neutral-400"
                           }`}>
                             {isPast ? (
                               <CheckCircle2 className="w-4 h-4" />
@@ -413,7 +413,7 @@ export default function AnalyzePage() {
                             )}
                           </div>
                           <span className={`text-sm font-medium ${
-                            isPast ? "text-neutral-300" : isActive ? "text-white" : "text-neutral-500"
+                            isPast ? "text-neutral-700" : isActive ? "text-neutral-900" : "text-neutral-400"
                           }`}>
                             {step.label}
                           </span>

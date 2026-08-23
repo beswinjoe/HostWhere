@@ -17,22 +17,22 @@ function SuccessContent() {
 
   return (
     <div className="w-full max-w-lg mx-auto hero-animate">
-      <div className="glass rounded-3xl p-10 sm:p-12 text-center relative overflow-hidden">
+      <div className="bg-white border border-neutral-200 shadow-sm rounded-3xl p-10 sm:p-12 text-center relative overflow-hidden">
         {/* Top glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent opacity-50" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-green-200 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-green-50 to-transparent opacity-50" />
 
         <div className="relative z-10">
           {/* Success icon */}
-          <div className="w-20 h-20 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(34,197,94,0.15)]">
-            <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+          <div className="w-20 h-20 rounded-2xl bg-green-50 border border-green-200 flex items-center justify-center mx-auto mb-6 shadow-sm">
+            <CheckCircle2 className="w-10 h-10 text-green-600" />
           </div>
 
-          <h1 className="font-display text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
+          <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-neutral-900 tracking-tight mb-3">
             Project Featured! 🎉
           </h1>
 
-          <p className="text-neutral-400 mb-8 leading-relaxed">
+          <p className="text-neutral-600 mb-8 leading-relaxed">
             Your payment was successful and your project is now live on the
             Featured Projects leaderboard. It may take a few moments for the
             leaderboard to update.
@@ -41,7 +41,7 @@ function SuccessContent() {
           {/* Action buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/featured" className="w-full sm:w-auto">
-              <button className="cta-glow w-full flex items-center justify-center gap-2 px-8 py-4 bg-white text-black hover:bg-neutral-200 rounded-full font-bold transition-all">
+              <button className="cta-glow w-full flex items-center justify-center gap-2 px-8 py-4 bg-green-600 text-white hover:bg-green-700 shadow-sm rounded-full font-bold transition-all">
                 <Trophy className="w-5 h-5" />
                 View Leaderboard
                 <ArrowRight className="w-4 h-4" />
@@ -49,7 +49,7 @@ function SuccessContent() {
             </Link>
 
             <Link href="/analyze" className="w-full sm:w-auto">
-              <button className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full font-semibold text-white transition-all">
+              <button className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-white hover:bg-neutral-50 border border-neutral-200 rounded-full font-semibold text-neutral-700 shadow-sm transition-all">
                 <Star className="w-4 h-4" />
                 Analyze Another
               </button>
@@ -63,17 +63,17 @@ function SuccessContent() {
 
 export default function SuccessPage() {
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-primary/30 relative overflow-hidden flex flex-col">
+    <div className="min-h-screen bg-neutral-50 text-neutral-900 selection:bg-green-100 relative overflow-hidden flex flex-col">
       <Navbar />
 
-      <div className="fixed inset-0 bg-grid z-0 pointer-events-none opacity-40" />
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none z-0" />
+      <div className="fixed inset-0 bg-grid z-0 pointer-events-none opacity-100" />
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-green-50/50 blur-[120px] rounded-full pointer-events-none z-0" />
 
       <main className="relative z-10 flex-1 flex items-center justify-center px-6 py-28">
         <Suspense
           fallback={
             <div className="flex items-center justify-center py-32">
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
+              <Loader2 className="w-8 h-8 text-green-600 animate-spin" />
             </div>
           }
         >

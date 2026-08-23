@@ -82,17 +82,17 @@ function CheckoutContent() {
   if (!repo) {
     return (
       <div className="flex flex-col items-center justify-center py-32">
-        <div className="glass p-10 rounded-3xl text-center max-w-md">
-          <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-6 border border-red-500/20">
-            <AlertCircle className="w-8 h-8 text-red-500" />
+        <div className="bg-white border border-neutral-200 shadow-sm p-10 rounded-3xl text-center max-w-md">
+          <div className="w-16 h-16 rounded-2xl bg-neutral-50 flex items-center justify-center mx-auto mb-6 border border-neutral-200">
+            <AlertCircle className="w-8 h-8 text-neutral-400" />
           </div>
-          <h2 className="text-2xl font-bold mb-3">Missing project info</h2>
-          <p className="text-neutral-400 mb-8 leading-relaxed">
+          <h2 className="text-2xl font-bold text-neutral-900 mb-3">Missing project info</h2>
+          <p className="text-neutral-600 mb-8 leading-relaxed">
             Please analyze a GitHub repository first, then use the
             &quot;Feature This Project&quot; button.
           </p>
           <Link href="/analyze">
-            <button className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-white text-black hover:bg-neutral-200 rounded-full font-semibold transition-all">
+            <button className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white hover:bg-blue-700 rounded-full font-semibold transition-all shadow-sm">
               Analyze a Project
               <ArrowRight className="w-4 h-4" />
             </button>
@@ -107,7 +107,7 @@ function CheckoutContent() {
       {/* Back link */}
       <Link
         href="/featured"
-        className="inline-flex items-center gap-1.5 text-sm text-neutral-400 hover:text-white transition-colors mb-8"
+        className="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors mb-8"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to leaderboard
@@ -115,17 +115,17 @@ function CheckoutContent() {
 
       {/* Header */}
       <div className="mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber-500/20 bg-amber-500/5 mb-4">
-          <Star className="w-3.5 h-3.5 text-amber-400" />
-          <span className="text-[11px] font-medium tracking-wide uppercase text-amber-300">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-neutral-200 bg-neutral-50 mb-4">
+          <Star className="w-3.5 h-3.5 text-neutral-400" />
+          <span className="text-[11px] font-medium tracking-wide uppercase text-neutral-700">
             {isExisting ? "Increase Your Bid" : "Feature This Project"}
           </span>
         </div>
 
-        <h1 className="font-display text-3xl sm:text-4xl font-extrabold tracking-tight mb-2">
+        <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-neutral-900 tracking-tight mb-2">
           {isExisting ? "Extend or Upgrade" : "Feature This Project"}
         </h1>
-        <p className="text-neutral-400">
+        <p className="text-neutral-600">
           {isExisting
             ? "Extend your current plan or upgrade to a higher tier for more visibility."
             : "Promote your analyzed project on the Featured Projects leaderboard."}
@@ -133,24 +133,24 @@ function CheckoutContent() {
       </div>
 
       {/* Project Info Card */}
-      <div className="glass rounded-2xl p-5 mb-6">
+      <div className="bg-white border border-neutral-200 shadow-sm rounded-2xl p-5 mb-6">
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-            <Star className="w-6 h-6 text-primary" />
+          <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
+            <Star className="w-6 h-6 text-blue-600" />
           </div>
           <div className="min-w-0">
-            <h3 className="font-bold text-white truncate">{name || "Project"}</h3>
+            <h3 className="font-bold text-neutral-900 truncate">{name || "Project"}</h3>
             <p className="text-xs text-neutral-500 font-mono truncate mt-0.5">
               {repo.replace("https://github.com/", "")}
             </p>
             <div className="flex items-center gap-2 mt-2">
               {framework && framework !== "unknown" && (
-                <span className="px-2 py-0.5 text-xs rounded-md bg-primary/10 text-primary/80 border border-primary/20">
+                <span className="px-2 py-0.5 text-xs rounded-md bg-blue-50 text-blue-700 border border-blue-200">
                   {framework}
                 </span>
               )}
               {host && host !== "unknown" && (
-                <span className="px-2 py-0.5 text-xs rounded-md bg-emerald-500/10 text-emerald-400/80 border border-emerald-500/20">
+                <span className="px-2 py-0.5 text-xs rounded-md bg-neutral-50 text-neutral-600 border border-neutral-200">
                   {host}
                 </span>
               )}
@@ -167,7 +167,7 @@ function CheckoutContent() {
           isUpgrade={isExisting} // Optional: we can disable lower tiers if needed
         />
         {error && (
-          <p className="text-red-400 text-sm mt-4 text-center">{error}</p>
+          <p className="text-neutral-600 text-sm mt-4 text-center">{error}</p>
         )}
       </div>
 
@@ -175,7 +175,7 @@ function CheckoutContent() {
       <button
         onClick={handleCheckout}
         disabled={loading || !selectedPlan}
-        className="cta-glow w-full flex items-center justify-center gap-3 px-8 py-4 bg-white text-black hover:bg-neutral-200 disabled:opacity-50 disabled:pointer-events-none rounded-full font-bold text-lg transition-all"
+        className="cta-glow w-full flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 text-white hover:bg-blue-700 shadow-sm disabled:opacity-50 disabled:pointer-events-none rounded-full font-bold text-lg transition-all"
       >
         {loading ? (
           <>
@@ -202,17 +202,17 @@ function CheckoutContent() {
 
 export default function CheckoutPage() {
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-primary/30 relative overflow-hidden flex flex-col">
+    <div className="min-h-screen bg-neutral-50 text-neutral-900 selection:bg-blue-100 relative overflow-hidden flex flex-col">
       <Navbar />
 
-      <div className="fixed inset-0 bg-grid z-0 pointer-events-none opacity-40" />
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none z-0" />
+      <div className="fixed inset-0 bg-grid z-0 pointer-events-none opacity-100" />
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-blue-50/50 blur-[120px] rounded-full pointer-events-none z-0" />
 
       <main className="relative z-10 flex-1 flex flex-col items-center px-6 py-28">
         <Suspense
           fallback={
             <div className="flex items-center justify-center py-32">
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
+              <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
             </div>
           }
         >

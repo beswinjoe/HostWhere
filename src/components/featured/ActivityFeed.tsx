@@ -28,13 +28,13 @@ function relativeTime(dateStr: string): string {
 function eventIcon(type: string) {
   switch (type) {
     case "featured":
-      return <Sparkles className="w-3.5 h-3.5 text-amber-400" />;
+      return <Sparkles className="w-3.5 h-3.5 text-amber-500" />;
     case "bid_increased":
-      return <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />;
+      return <TrendingUp className="w-3.5 h-3.5 text-blue-500" />;
     case "click":
-      return <MousePointerClick className="w-3.5 h-3.5 text-blue-400" />;
+      return <MousePointerClick className="w-3.5 h-3.5 text-neutral-500" />;
     case "rank_changed":
-      return <Trophy className="w-3.5 h-3.5 text-purple-400" />;
+      return <Trophy className="w-3.5 h-3.5 text-orange-500" />;
     default:
       return <Sparkles className="w-3.5 h-3.5 text-neutral-400" />;
   }
@@ -43,15 +43,15 @@ function eventIcon(type: string) {
 function eventDotColor(type: string) {
   switch (type) {
     case "featured":
-      return "bg-amber-400/20 border-amber-400/40";
+      return "bg-amber-100 border-amber-200";
     case "bid_increased":
-      return "bg-emerald-400/20 border-emerald-400/40";
+      return "bg-blue-100 border-blue-200";
     case "click":
-      return "bg-blue-400/20 border-blue-400/40";
+      return "bg-neutral-100 border-neutral-200";
     case "rank_changed":
-      return "bg-purple-400/20 border-purple-400/40";
+      return "bg-orange-100 border-orange-200";
     default:
-      return "bg-neutral-400/20 border-neutral-400/40";
+      return "bg-neutral-100 border-neutral-200";
   }
 }
 
@@ -88,8 +88,8 @@ export function ActivityFeed() {
   return (
     <div className="glass rounded-2xl p-6 h-full">
       <div className="flex items-center gap-2 mb-5">
-        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-        <h3 className="font-semibold text-sm uppercase tracking-wider text-neutral-400">
+        <div className="w-2 h-2 rounded-full bg-neutral-400 animate-pulse" />
+        <h3 className="font-semibold text-sm uppercase tracking-wider text-neutral-500">
           Live Activity
         </h3>
       </div>
@@ -100,9 +100,9 @@ export function ActivityFeed() {
         </div>
       ) : events.length === 0 ? (
         <div className="text-center py-12">
-          <Sparkles className="w-8 h-8 text-neutral-700 mx-auto mb-3" />
+          <Sparkles className="w-8 h-8 text-neutral-300 mx-auto mb-3" />
           <p className="text-sm text-neutral-500">No activity yet.</p>
-          <p className="text-xs text-neutral-600 mt-1">
+          <p className="text-xs text-neutral-400 mt-1">
             Be the first to feature a project!
           </p>
         </div>
@@ -120,10 +120,10 @@ export function ActivityFeed() {
                 {eventIcon(event.type)}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-neutral-300 leading-snug truncate">
+                <p className="text-sm text-neutral-700 leading-snug truncate">
                   {event.description}
                 </p>
-                <p className="text-xs text-neutral-600 mt-0.5">
+                <p className="text-xs text-neutral-400 mt-0.5">
                   {relativeTime(event.created_at)}
                 </p>
               </div>

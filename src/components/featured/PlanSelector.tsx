@@ -14,28 +14,28 @@ export function PlanSelector({ value, onChange, isUpgrade }: PlanSelectorProps) 
   const plans = [
     {
       ...FEATURED_PLANS.boost,
-      icon: <Zap className="w-6 h-6 text-emerald-400" />,
-      color: "from-emerald-500/20 to-emerald-500/5",
-      borderColor: "border-emerald-500/20",
-      activeBorder: "border-emerald-500",
+      icon: <Zap className="w-6 h-6 text-blue-500" />,
+      color: "from-blue-50 to-transparent",
+      borderColor: "border-neutral-200",
+      activeBorder: "border-blue-500",
       badge: undefined as string | undefined,
       disabled: isUpgrade, // Cannot downgrade to boost if already featured
     },
     {
       ...FEATURED_PLANS.featured,
-      icon: <Star className="w-6 h-6 text-amber-400" />,
-      color: "from-amber-500/20 to-amber-500/5",
-      borderColor: "border-amber-500/20",
+      icon: <Star className="w-6 h-6 text-amber-500" />,
+      color: "from-amber-50 to-transparent",
+      borderColor: "border-neutral-200",
       activeBorder: "border-amber-500",
       badge: "Most Popular",
       disabled: false,
     },
     {
       ...FEATURED_PLANS.spotlight,
-      icon: <Crown className="w-6 h-6 text-cyan-400" />,
-      color: "from-cyan-500/20 to-cyan-500/5",
-      borderColor: "border-cyan-500/20",
-      activeBorder: "border-cyan-500",
+      icon: <Crown className="w-6 h-6 text-purple-600" />,
+      color: "from-purple-50 to-transparent",
+      borderColor: "border-neutral-200",
+      activeBorder: "border-purple-600",
       badge: "Premium",
       disabled: false,
     },
@@ -55,15 +55,15 @@ export function PlanSelector({ value, onChange, isUpgrade }: PlanSelectorProps) 
             onClick={() => onChange(plan.id)}
             className={`relative flex flex-col text-left p-6 rounded-2xl border transition-all duration-300 ${
               isSelected
-                ? `bg-gradient-to-b ${plan.color} ${plan.activeBorder} shadow-lg scale-[1.02]`
+                ? `bg-gradient-to-b ${plan.color} ${plan.activeBorder} shadow-md scale-[1.02]`
                 : isDisabled 
-                  ? "bg-white/5 border-white/5 opacity-50 cursor-not-allowed"
-                  : `glass ${plan.borderColor} hover:bg-white/10 hover:border-white/20`
+                  ? "bg-neutral-50 border-neutral-100 opacity-50 cursor-not-allowed"
+                  : `bg-white ${plan.borderColor} hover:bg-neutral-50 hover:border-neutral-300 shadow-sm`
             }`}
           >
             {plan.badge && (
               <span className={`absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                isSelected ? "bg-white text-black" : "bg-neutral-800 text-neutral-300 border border-white/10"
+                isSelected ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-600 border border-neutral-200"
               }`}>
                 {plan.badge}
               </span>
@@ -71,22 +71,22 @@ export function PlanSelector({ value, onChange, isUpgrade }: PlanSelectorProps) 
             
             <div className="mb-4">{plan.icon}</div>
             
-            <h3 className="text-xl font-bold text-white mb-1">{plan.name}</h3>
+            <h3 className="text-xl font-bold text-neutral-900 mb-1">{plan.name}</h3>
             
-            <div className="flex items-baseline gap-1 mb-4">
+            <div className="flex items-baseline gap-1 mb-4 text-neutral-900">
               <span className="text-2xl font-bold">{formatCentsToUSD(plan.priceCents)}</span>
-              <span className="text-xs text-neutral-400 uppercase font-semibold">/ {plan.durationDays} Days</span>
+              <span className="text-xs text-neutral-500 uppercase font-semibold">/ {plan.durationDays} Days</span>
             </div>
             
-            <p className="text-sm text-neutral-400 mb-6 flex-grow leading-relaxed">
+            <p className="text-sm text-neutral-600 mb-6 flex-grow leading-relaxed">
               {plan.description}
             </p>
             
             <div className={`mt-auto flex items-center gap-2 text-sm font-medium ${
-              isSelected ? "text-white" : "text-neutral-500"
+              isSelected ? "text-neutral-900" : "text-neutral-500"
             }`}>
               <div className={`w-5 h-5 rounded-full flex items-center justify-center border ${
-                isSelected ? "bg-white border-white text-black" : "border-neutral-600"
+                isSelected ? "bg-neutral-900 border-neutral-900 text-white" : "border-neutral-300 bg-white"
               }`}>
                 {isSelected && <Check className="w-3 h-3" />}
               </div>

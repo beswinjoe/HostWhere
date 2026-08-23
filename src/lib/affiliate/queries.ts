@@ -44,6 +44,12 @@ export async function getAffiliateDashboardData() {
     .eq("affiliate_user_id", user.id)
     .order("created_at", { ascending: false });
 
+  const { data: payouts } = await supabase
+    .from("affiliate_payouts")
+    .select("*")
+    .eq("affiliate_user_id", user.id)
+    .order("created_at", { ascending: false });
+
   const totalConversions = commissions?.length || 0;
   
   let pendingCents = 0;
@@ -64,6 +70,18 @@ export async function getAffiliateDashboardData() {
     }
   }
 
+  // Deduct requested/paid payouts from available balance
+  if (payouts) {
+    for (const p of payouts) {
+      if (p.status !== "rejected") {
+        availableCents -= p.amount_cents;
+      }
+    }
+  }
+
+  // Ensure available doesn't go below 0 (just in case of manual adjustments)
+  if (availableCents < 0) availableCents = 0;
+
   return {
     username: profile.username,
     stats: {
@@ -76,5 +94,6 @@ export async function getAffiliateDashboardData() {
       totalCents,
     },
     recentCommissions: commissions?.slice(0, 10) || [],
+    payoutHistory: payouts || [],
   };
 }

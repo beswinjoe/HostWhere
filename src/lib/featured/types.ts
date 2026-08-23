@@ -23,6 +23,15 @@ export interface FeaturedProject {
   priority?: number;
   featured_at?: string;
   expires_at?: string;
+  website_url?: string;
+  demo_url?: string;
+  project_type?: string;
+  use_case_description?: string;
+  owner_name?: string;
+  company_name?: string;
+  short_description?: string;
+  category?: string;
+  social_links?: Record<string, unknown>; // JSONB
 }
 
 export type PlanType = "boost" | "featured" | "spotlight";

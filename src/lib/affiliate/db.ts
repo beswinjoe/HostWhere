@@ -68,6 +68,12 @@ export async function createAffiliateCommission(
   commissionRate: number,
   commissionAmountCents: number
 ) {
+  // Fraud protection: Prevent self-referrals
+  if (affiliateUserId === referredUserId) {
+    console.warn(`[Affiliate] Blocked self-referral for user ${affiliateUserId}`);
+    return null;
+  }
+
   // Available in 30 days
   const availableAt = new Date();
   availableAt.setDate(availableAt.getDate() + 30);
@@ -105,4 +111,32 @@ export async function updateCommissionStatus(paymentId: string, status: "availab
     .eq("payment_id", paymentId);
     
   if (error) console.error("Error updating commission status:", error);
+}
+
+export async function createPayoutRequest(
+  affiliateUserId: string,
+  amountCents: number,
+  payoutMethod: string,
+  payoutDetails: string
+) {
+  const { data, error } = await supabase
+    .from("affiliate_payouts")
+    .insert([
+      {
+        affiliate_user_id: affiliateUserId,
+        amount_cents: amountCents,
+        payout_method: payoutMethod,
+        payout_details: payoutDetails,
+        status: "pending"
+      }
+    ])
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error creating payout request:", error);
+    return null;
+  }
+  
+  return data;
 }
