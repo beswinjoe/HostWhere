@@ -50,6 +50,20 @@ export async function POST(request: NextRequest) {
     
     const amountCents = planConfig.priceCents;
 
+    // Get current user if logged in
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll(); },
+          setAll() {}, // API route doesn't need to set auth cookies here
+        },
+      }
+    );
+    const { data: { user } } = await supabase.auth.getUser();
+
     // ── Find or create the featured project ────────────────
     let project = await getFeaturedProjectByRepo(body.repository_url);
 
@@ -61,6 +75,7 @@ export async function POST(request: NextRequest) {
         framework: body.framework || "unknown",
         recommended_host: body.recommended_host || "unknown",
         analysis_result_id: body.analysis_result_id,
+        owner_id: user?.id,
       });
     }
 
@@ -82,20 +97,6 @@ export async function POST(request: NextRequest) {
 
     // ── Affiliate Attribution ──────────────────────────────
     let affiliateUserId: string | undefined = undefined;
-    
-    // Get current user if logged in
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() { return cookieStore.getAll(); },
-          setAll() {}, // API route doesn't need to set auth cookies here
-        },
-      }
-    );
-    const { data: { user } } = await supabase.auth.getUser();
 
     // 1. Check for active cookie
     const hwReferralCookie = request.cookies.get("hw_referral")?.value;

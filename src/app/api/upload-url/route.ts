@@ -1,9 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { rateLimiter } from "@/lib/rate-limit";
+
+function getIp(request: NextRequest): string {
+  return request.headers.get("x-forwarded-for")?.split(",")[0] || 
+         request.headers.get("x-real-ip") || 
+         "unknown-ip";
+}
 
 export async function POST(request: NextRequest) {
   try {
     const { filePath } = await request.json();
+
+    const ip = getIp(request);
+    const rateLimit = await rateLimiter.check(ip);
+    
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { 
+          status: 429,
+          headers: {
+            "X-RateLimit-Limit": rateLimit.limit.toString(),
+            "X-RateLimit-Remaining": rateLimit.remaining.toString(),
+            "X-RateLimit-Reset": rateLimit.reset.toString(),
+          }
+        }
+      );
+    }
 
     if (!filePath || typeof filePath !== "string") {
       return NextResponse.json({ error: "filePath is required." }, { status: 400 });

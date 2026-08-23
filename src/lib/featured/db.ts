@@ -82,6 +82,7 @@ export async function createFeaturedProject(project: {
   framework: string;
   recommended_host: string;
   analysis_result_id?: string;
+  owner_id?: string;
 }): Promise<FeaturedProject> {
   const supabase = getSupabaseServerClient();
 
@@ -94,6 +95,7 @@ export async function createFeaturedProject(project: {
       framework: project.framework || "unknown",
       recommended_host: project.recommended_host || "unknown",
       analysis_result_id: project.analysis_result_id || null,
+      owner_id: project.owner_id || null,
       total_bid_cents: 0,
       total_clicks: 0,
       featured_active: false, // Will be activated after successful payment

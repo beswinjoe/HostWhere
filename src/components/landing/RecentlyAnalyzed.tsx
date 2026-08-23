@@ -42,7 +42,9 @@ export function RecentlyAnalyzed() {
   useEffect(() => {
     let cancelled = false;
 
-    async function fetchRecent() {
+    const fetchRecent = async () => {
+      setLoading(true);
+      setError(false);
       try {
         const res = await fetch("/api/analyze/recent");
         if (res.status === 401) {
@@ -58,7 +60,7 @@ export function RecentlyAnalyzed() {
       } finally {
         if (!cancelled) setLoading(false);
       }
-    }
+    };
 
     fetchRecent();
 
@@ -71,13 +73,33 @@ export function RecentlyAnalyzed() {
     });
 
     return () => { 
-      cancelled = true; 
+      cancelled = true;
       subscription.unsubscribe();
     };
   }, []);
 
-  if (notAuthenticated || error) {
-    return null; // Gracefully fail / hide if not authenticated or error
+  if (notAuthenticated) {
+    return null; // Gracefully fail / hide if not authenticated
+  }
+
+  if (error) {
+    return (
+      <section className="px-6 mb-32 max-w-6xl mx-auto">
+        <div className="flex flex-col items-center justify-center p-12 bg-white border border-neutral-200 rounded-3xl text-center shadow-sm">
+          <Clock className="w-12 h-12 text-neutral-300 mb-4" />
+          <h2 className="text-xl font-bold text-neutral-900 mb-2">Couldn&apos;t load recent projects</h2>
+          <p className="text-neutral-500 mb-6 max-w-md">
+            We encountered a problem loading your recently analyzed projects.
+          </p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 font-bold rounded-xl transition-all"
+          >
+            Retry
+          </button>
+        </div>
+      </section>
+    );
   }
 
   // Handle empty state gracefully

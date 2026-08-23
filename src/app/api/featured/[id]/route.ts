@@ -55,8 +55,19 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // In a real app we'd verify the user owns the project here
-    // For now we just allow authenticated users to edit
+    const { data: project, error: fetchError } = await supabaseAdmin
+      .from("featured_projects")
+      .select("owner_id")
+      .eq("id", id)
+      .single();
+
+    if (fetchError || !project) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
+
+    if (project.owner_id !== user.id) {
+      return NextResponse.json({ error: "Forbidden: You do not own this project." }, { status: 403 });
+    }
 
     const body = await request.json();
     const { 
