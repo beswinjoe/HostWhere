@@ -181,16 +181,13 @@ export default function FeaturedPromotionPage() {
                 </p>
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-center gap-3 text-sm text-neutral-700 font-medium">
-                    <CheckCircle2 className="w-5 h-5 text-blue-500 shrink-0" /> Leaderboard Visibility
-                  </li>
-                  <li className="flex items-center gap-3 text-sm text-neutral-700 font-medium">
                     <CheckCircle2 className="w-5 h-5 text-blue-500 shrink-0" /> Priority Level {FEATURED_PLANS.boost.priority}
                   </li>
-                  <li className="flex items-center gap-3 text-sm text-neutral-400 font-medium">
-                    <XCircle className="w-5 h-5 text-neutral-300 shrink-0" /> <span className="line-through">Project Profile Editing</span>
+                  <li className="flex items-center gap-3 text-sm text-neutral-700 font-medium">
+                    <CheckCircle2 className="w-5 h-5 text-blue-500 shrink-0" /> Appears on Leaderboard
                   </li>
-                  <li className="flex items-center gap-3 text-sm text-neutral-400 font-medium">
-                    <XCircle className="w-5 h-5 text-neutral-300 shrink-0" /> <span className="line-through">Homepage Placement</span>
+                  <li className="flex items-center gap-3 text-sm text-neutral-500 font-medium">
+                    <XCircle className="w-5 h-5 text-red-500 shrink-0" /> Editable Project Profile
                   </li>
                 </ul>
                 <Link href="/analyze" className="mt-auto">
@@ -220,7 +217,10 @@ export default function FeaturedPromotionPage() {
                 <p className="text-neutral-600 mb-8 flex-grow relative z-10">
                   Higher visibility with editable project profile for 14 days.
                 </p>
-                <ul className="space-y-3 mb-8 relative z-10">
+                <ul className="space-y-2 mb-8 relative z-10">
+                  <li className="flex items-center gap-3 text-sm text-neutral-800 font-medium">
+                    <CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0" /> Priority Level {FEATURED_PLANS.featured.priority}
+                  </li>
                   <li className="flex items-center gap-3 text-sm text-neutral-800 font-medium">
                     <CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0" /> Higher Leaderboard Ranking
                   </li>
@@ -230,13 +230,17 @@ export default function FeaturedPromotionPage() {
                   <li className="flex items-center gap-3 text-sm text-neutral-800 font-medium">
                     <CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0" /> Editable Project Profile
                   </li>
-                  <li className="flex items-start gap-3 text-sm text-neutral-500 font-medium pl-8">
-                    <span className="leading-relaxed">
-                      <Globe className="w-3.5 h-3.5 inline -mt-0.5 mr-1 text-amber-400" />Website &amp; Demo Links ·
-                      <UserCircle className="w-3.5 h-3.5 inline -mt-0.5 mx-1 text-amber-400" />Creator Name ·
-                      <Layers className="w-3.5 h-3.5 inline -mt-0.5 mx-1 text-amber-400" />Category ·
-                      <Share2 className="w-3.5 h-3.5 inline -mt-0.5 mx-1 text-amber-400" />Social Links
-                    </span>
+                  <li className="flex items-center gap-3 text-sm text-neutral-700 font-medium pl-2">
+                    <Globe className="w-4 h-4 text-amber-500 shrink-0" /> Add Website &amp; Live Demo Links
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-700 font-medium pl-2">
+                    <UserCircle className="w-4 h-4 text-amber-500 shrink-0" /> Add Creator / Company Name
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-700 font-medium pl-2">
+                    <Layers className="w-4 h-4 text-amber-500 shrink-0" /> Add Category &amp; Project Details
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-700 font-medium pl-2">
+                    <Share2 className="w-4 h-4 text-amber-500 shrink-0" /> Add Social Media Links
                   </li>
                 </ul>
                 <Link href="/analyze" className="mt-auto relative z-10">
@@ -261,7 +265,10 @@ export default function FeaturedPromotionPage() {
                 <p className="text-neutral-600 mb-8 flex-grow">
                   Premium visibility and top placement for 30 days.
                 </p>
-                <ul className="space-y-3 mb-8">
+                <ul className="space-y-2 mb-8">
+                  <li className="flex items-center gap-3 text-sm text-neutral-800 font-medium">
+                    <CheckCircle2 className="w-5 h-5 text-purple-600 shrink-0" /> Priority Level {FEATURED_PLANS.spotlight.priority} (Maximum)
+                  </li>
                   <li className="flex items-center gap-3 text-sm text-neutral-800 font-medium">
                     <CheckCircle2 className="w-5 h-5 text-purple-600 shrink-0" /> Top Leaderboard Ranking
                   </li>
@@ -269,15 +276,19 @@ export default function FeaturedPromotionPage() {
                     <CheckCircle2 className="w-5 h-5 text-purple-600 shrink-0" /> Priority Homepage Placement
                   </li>
                   <li className="flex items-center gap-3 text-sm text-neutral-800 font-medium">
-                    <CheckCircle2 className="w-5 h-5 text-purple-600 shrink-0" /> Premium Editable Profile
+                    <CheckCircle2 className="w-5 h-5 text-purple-600 shrink-0" /> Premium Editable Project Profile
                   </li>
-                  <li className="flex items-start gap-3 text-sm text-neutral-500 font-medium pl-8">
-                    <span className="leading-relaxed">
-                      <Globe className="w-3.5 h-3.5 inline -mt-0.5 mr-1 text-purple-400" />Website &amp; Demo Links ·
-                      <UserCircle className="w-3.5 h-3.5 inline -mt-0.5 mx-1 text-purple-400" />Creator Name ·
-                      <Layers className="w-3.5 h-3.5 inline -mt-0.5 mx-1 text-purple-400" />Category ·
-                      <Share2 className="w-3.5 h-3.5 inline -mt-0.5 mx-1 text-purple-400" />Social Links
-                    </span>
+                  <li className="flex items-center gap-3 text-sm text-neutral-700 font-medium pl-2">
+                    <Globe className="w-4 h-4 text-purple-600 shrink-0" /> Add Website &amp; Live Demo Links
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-700 font-medium pl-2">
+                    <UserCircle className="w-4 h-4 text-purple-600 shrink-0" /> Add Creator / Company Name
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-700 font-medium pl-2">
+                    <Layers className="w-4 h-4 text-purple-600 shrink-0" /> Add Category &amp; Project Details
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-700 font-medium pl-2">
+                    <Share2 className="w-4 h-4 text-purple-600 shrink-0" /> Add Social Media Links
                   </li>
                 </ul>
                 <Link href="/analyze" className="mt-auto">
