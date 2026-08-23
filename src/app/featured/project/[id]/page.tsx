@@ -2,17 +2,13 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ExternalLink, Globe, Play, MousePointerClick, TrendingUp, Settings, MessageSquare, Briefcase, UserCircle } from "lucide-react";
 import { Navbar } from "@/components/landing/Navbar";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseAdminClient } from "@/lib/supabase/server";
+import { getSupabaseServerClient } from "@/lib/supabase/auth-server";
 import type { FeaturedProject } from "@/lib/featured/types";
 import { FEATURED_PLANS, type PlanType } from "@/lib/featured/types";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
 
 async function getProject(id: string): Promise<FeaturedProject | null> {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  const supabase = getSupabaseAdminClient();
 
   const { data, error } = await supabase
     .from("featured_projects")
@@ -39,20 +35,10 @@ export default async function ProjectProfilePage({
     notFound();
   }
 
-  const cookieStore = await cookies();
-  const supabaseAuth = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return cookieStore.getAll(); },
-        setAll() {},
-      },
-    }
-  );
+  const supabaseAuth = await getSupabaseServerClient();
   
   const { data: { user } } = await supabaseAuth.auth.getUser();
-  const canManage = !!user;
+  const canManage = !!user && user.id === project.owner_id && (project.plan === "featured" || project.plan === "spotlight");
   const planConfig = project.plan ? FEATURED_PLANS[project.plan as PlanType] : null;
 
   return (

@@ -25,11 +25,17 @@ function getRelativeTime(dateString: string) {
 
 type ProjectItem = {
   id: string;
+  analysis_id: string;
   project_name?: string;
-  repository_url?: string;
+  github_url?: string;
+  source_type?: string;
   framework?: string;
-  status?: string;
-  recommended_host?: string;
+  compatibility_summary?: {
+    compatible?: number;
+    possible?: number;
+    incompatible?: number;
+  };
+  is_public?: boolean;
   created_at: string;
 };
 
@@ -55,7 +61,7 @@ export function RecentlyAnalyzed() {
         } else if (!res.ok) {
           if (!cancelled) setError(true);
         }
-      } catch (err) {
+      } catch {
         if (!cancelled) setError(true);
       } finally {
         if (!cancelled) setLoading(false);
@@ -162,18 +168,23 @@ export function RecentlyAnalyzed() {
             </div>
           ))
         ) : (
-          // Real Data
+          // Real Data — use analysis_id for the result link, github_url for display
           projects.map((item, i) => {
+            const compat = item.compatibility_summary;
+            const compatLabel = compat
+              ? `${compat.compatible || 0} compatible, ${compat.possible || 0} possible`
+              : null;
+
             return (
               <ScrollReveal key={item.id} delay={i * 50}>
-                <Link href={`/results/${item.id}`}>
+                <Link href={`/results/${item.analysis_id}`}>
                   <div className="bg-white p-5 rounded-2xl border border-neutral-200 hover:border-blue-300 transition-all flex flex-col h-full group hover:bg-neutral-50 shadow-sm hover:shadow-md">
                     <div className="flex-grow mb-4">
                       <h3 className="font-bold text-neutral-900 text-lg tracking-tight mb-1 truncate group-hover:text-blue-700 transition-colors">
                         {item.project_name || "Unknown Project"}
                       </h3>
                       <p className="text-xs text-neutral-500 font-mono truncate">
-                        {item.repository_url?.replace("https://github.com/", "") || item.id.substring(0, 15)}
+                        {item.github_url?.replace("https://github.com/", "") || item.source_type || item.analysis_id?.substring(0, 15)}
                       </p>
                     </div>
 
@@ -185,20 +196,14 @@ export function RecentlyAnalyzed() {
                             {item.framework}
                           </span>
                         )}
-                        {item.status === "completed" ? (
-                          <span className="px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 border bg-green-50 text-green-700 border-green-200">
-                            Completed
-                          </span>
-                        ) : (
-                          <span className="px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 border bg-amber-50 text-amber-700 border-amber-200">
-                            {item.status || "Pending"}
-                          </span>
-                        )}
+                        <span className="px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 border bg-green-50 text-green-700 border-green-200">
+                          Completed
+                        </span>
                       </div>
                       
                       <div className="flex items-center justify-between text-xs text-neutral-500 border-t border-neutral-200 pt-3 mt-1">
                         <span className="text-neutral-500">
-                          {item.recommended_host ? `Recommended: ${item.recommended_host}` : "Analyzing..."}
+                          {compatLabel || "View results →"}
                         </span>
                         <span>{getRelativeTime(item.created_at)}</span>
                       </div>

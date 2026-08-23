@@ -3,10 +3,10 @@ import { extractZipSafely, sanitizeProjectName } from "@/lib/analyzer/zip-handle
 import { analyzeProject } from "@/lib/analyzer/analyzer";
 import { resultsStore } from "@/lib/analyzer/results-store";
 import { rateLimiter } from "@/lib/rate-limit";
-import { createClient } from "@/lib/supabase/auth-server";
+import { getSupabaseServerClient } from "@/lib/supabase/auth-server";
 import { analytics } from "@/lib/analytics";
 import { AnalysisSource } from "@/lib/analyzer/types";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getSupabaseAdminClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
 
       storagePathToDelete = storagePath;
       
-      const supabase = getSupabaseServerClient();
+      const supabase = getSupabaseAdminClient();
       const { data, error } = await supabase.storage.from("hostwhere-uploads").download(storagePath);
       
       if (error || !data) {
@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
 
     // Save to user history if authenticated
     try {
-      const authSupabase = await createClient();
+      const authSupabase = await getSupabaseServerClient();
       const { data: { user } } = await authSupabase.auth.getUser();
 
       if (user) {
@@ -254,7 +254,7 @@ export async function POST(request: NextRequest) {
   } finally {
     if (storagePathToDelete) {
       try {
-        const supabase = getSupabaseServerClient();
+        const supabase = getSupabaseAdminClient();
         await supabase.storage.from("hostwhere-uploads").remove([storagePathToDelete]);
       } catch (err) {
         console.error("[API Error] Failed to delete file from Supabase storage:", err);

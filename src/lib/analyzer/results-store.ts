@@ -1,5 +1,5 @@
 import { AnalysisResult } from "./types";
-import { getSupabaseServerClient } from "../supabase/server";
+import { getSupabaseAdminClient } from "../supabase/server";
 
 export interface ResultsStore {
   storeResult(result: AnalysisResult): Promise<void>;
@@ -60,7 +60,7 @@ export class InMemoryResultsStore implements ResultsStore {
 
 export class SupabaseResultsStore implements ResultsStore {
   async storeResult(result: AnalysisResult): Promise<void> {
-    const supabase = getSupabaseServerClient();
+    const supabase = getSupabaseAdminClient();
     const expiresAt = new Date(Date.now() + TTL_MS).toISOString();
 
     const { error } = await supabase
@@ -79,7 +79,7 @@ export class SupabaseResultsStore implements ResultsStore {
   }
 
   async getResult(id: string): Promise<AnalysisResult | null> {
-    const supabase = getSupabaseServerClient();
+    const supabase = getSupabaseAdminClient();
 
     const { data, error } = await supabase
       .from("analysis_results")
@@ -102,7 +102,7 @@ export class SupabaseResultsStore implements ResultsStore {
   }
 
   async deleteResult(id: string): Promise<void> {
-    const supabase = getSupabaseServerClient();
+    const supabase = getSupabaseAdminClient();
     await supabase.from("analysis_results").delete().eq("id", id);
   }
 }

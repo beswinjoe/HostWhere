@@ -294,4 +294,55 @@
   .arrow-hover:hover .arrow-icon {
     transform: none;
   }
+  .featured-star-glow,
+  .spotlight-crown-glow,
+  .featured-badge-glow {
+    animation: none !important;
+    filter: none !important;
+  }
+}
+
+/* ── Featured Star Glow (Gold / Amber) ──────────────────────── */
+@keyframes starGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.65))
+            drop-shadow(0 0 20px rgba(245, 158, 11, 0.2));
+  }
+}
+
+.featured-star-glow {
+  animation: starGlow 3s ease-in-out infinite;
+}
+
+/* ── Spotlight Crown Glow (Purple) ──────────────────────────── */
+@keyframes crownGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 3px rgba(147, 51, 234, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(147, 51, 234, 0.5))
+            drop-shadow(0 0 16px rgba(147, 51, 234, 0.15));
+  }
+}
+
+.spotlight-crown-glow {
+  animation: crownGlow 4s ease-in-out infinite;
+}
+
+/* ── Featured Badge Glow ────────────────────────────────────── */
+@keyframes badgeGlow {
+  0%, 100% {
+    box-shadow: 0 1px 3px rgba(245, 158, 11, 0.15);
+  }
+  50% {
+    box-shadow: 0 1px 8px rgba(245, 158, 11, 0.3),
+                0 0 16px rgba(245, 158, 11, 0.1);
+  }
+}
+
+.featured-badge-glow {
+  animation: badgeGlow 3s ease-in-out infinite;
 }

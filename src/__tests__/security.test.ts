@@ -28,11 +28,11 @@ const { mockSupabaseAdmin, mockAuthSupabase } = vi.hoisted(() => {
 });
 
 vi.mock("@/lib/supabase/server", () => ({
-  getSupabaseServerClient: () => mockSupabaseAdmin,
+  getSupabaseAdminClient: () => mockSupabaseAdmin,
 }));
 
 vi.mock("@/lib/supabase/auth-server", () => ({
-  createClient: async () => mockAuthSupabase,
+  getSupabaseServerClient: async () => mockAuthSupabase,
 }));
 
 vi.mock("@supabase/ssr", () => ({
@@ -40,7 +40,7 @@ vi.mock("@supabase/ssr", () => ({
 }));
 
 vi.mock("@supabase/supabase-js", () => ({
-  createClient: () => mockSupabaseAdmin,
+  getSupabaseAdminClient: () => mockSupabaseAdmin,
 }));
 
 vi.mock("next/headers", () => ({
@@ -151,14 +151,14 @@ describe("HostWhere Security Audits Concept Tests", () => {
       expect(res.status).toBe(403);
     });
 
-    it("allows PATCH request if user owns the project", async () => {
+    it("allows PATCH request if user owns the project and has an eligible plan", async () => {
       mockAuthSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: "user-123" } } });
 
       mockSupabaseAdmin.from.mockReturnValue({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         update: vi.fn().mockReturnThis(),
-        single: vi.fn().mockResolvedValue({ data: { owner_id: "user-123" } }),
+        single: vi.fn().mockResolvedValue({ data: { owner_id: "user-123", plan: "featured" } }),
       });
 
       const req = new NextRequest("http://localhost/api/featured/123", {
@@ -168,6 +168,24 @@ describe("HostWhere Security Audits Concept Tests", () => {
       const res = await patchFeaturedHandler(req, { params: Promise.resolve({ id: "123" }) });
 
       expect(res.status).toBe(200);
+    });
+
+    it("denies PATCH request if user owns the project but has Boost plan", async () => {
+      mockAuthSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: "user-123" } } });
+
+      mockSupabaseAdmin.from.mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { owner_id: "user-123", plan: "boost" } }),
+      });
+
+      const req = new NextRequest("http://localhost/api/featured/123", {
+        method: "PATCH",
+        body: JSON.stringify({ website_url: "https://test.com" }),
+      });
+      const res = await patchFeaturedHandler(req, { params: Promise.resolve({ id: "123" }) });
+
+      expect(res.status).toBe(403);
     });
   });
 

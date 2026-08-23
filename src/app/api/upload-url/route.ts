@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getSupabaseAdminClient } from "@/lib/supabase/server";
 import { rateLimiter } from "@/lib/rate-limit";
 
 function getIp(request: NextRequest): string {
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid upload path." }, { status: 400 });
     }
 
-    const supabase = getSupabaseServerClient();
+    const supabase = getSupabaseAdminClient();
     
     // Diagnostic logging
     console.log("[UPLOAD-URL] Request received");

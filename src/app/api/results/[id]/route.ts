@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { resultsStore } from "@/lib/analyzer/results-store";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { createClient } from "@/lib/supabase/auth-server";
+import { getSupabaseAdminClient } from "@/lib/supabase/server";
+import { getSupabaseServerClient } from "@/lib/supabase/auth-server";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +26,7 @@ export async function GET(
   }
 
   // Check if this analysis is linked to a specific user
-  const supabaseAdmin = getSupabaseServerClient();
+  const supabaseAdmin = getSupabaseAdminClient();
   const { data: userAnalysis } = await supabaseAdmin
     .from("user_analyses")
     .select("user_id")
@@ -35,7 +35,7 @@ export async function GET(
 
   if (userAnalysis) {
     // Requires authorization
-    const authSupabase = await createClient();
+    const authSupabase = await getSupabaseServerClient();
     const { data: { user } } = await authSupabase.auth.getUser();
 
     if (!user || user.id !== userAnalysis.user_id) {

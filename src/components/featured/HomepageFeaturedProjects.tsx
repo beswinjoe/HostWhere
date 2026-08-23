@@ -135,7 +135,7 @@ export function HomepageFeaturedProjects() {
                   </div>
 
                   <div className="relative z-10">
-                    <Link href={`/results/${project.analysis_result_id || `github-${project.repository_url.replace("https://github.com/", "").replace("/", "-")}`}`}>
+                    <Link href={`/featured/project/${project.id}`}>
                       <button className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white hover:bg-${gradientColor}-50 text-neutral-700 hover:text-${gradientColor}-700 border border-neutral-200 hover:border-${gradientColor}-200 text-sm font-bold transition-all shadow-sm`}>
                         View Project
                         <ArrowRight className="w-4 h-4 opacity-70" />

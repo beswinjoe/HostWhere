@@ -20,7 +20,7 @@ import {
   CloudUpload
 } from "lucide-react";
 import { Navbar } from "@/components/landing/Navbar";
-import { getSupabaseClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/auth-client";
 import { AnalysisSource } from "@/lib/analyzer/types";
 
 const ANALYSIS_STEPS = [
@@ -97,7 +97,7 @@ export default function AnalyzePage() {
 
     try {
       if (mode === "zip" && file) {
-        const supabase = getSupabaseClient();
+        const supabase = createClient();
         // Generate random UUID using web crypto
         const uuid = crypto.randomUUID();
         // Sanitize file name for storage path (remove spaces and special chars)

@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/auth-server";
+import { getSupabaseServerClient } from "@/lib/supabase/auth-server";
 import { redirect } from "next/navigation";
 import { Navbar } from "@/components/landing/Navbar";
 import { History, Code2, Globe, Lock, ArrowRight, CheckCircle2, FileArchive } from "lucide-react";
@@ -7,7 +7,7 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 export default async function MyAnalysesPage() {
-  const supabase = await createClient();
+  const supabase = await getSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {

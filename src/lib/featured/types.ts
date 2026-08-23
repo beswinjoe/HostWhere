@@ -11,6 +11,7 @@ export interface FeaturedProject {
   description: string;
   framework: string;
   recommended_host: string;
+  owner_id?: string | null;
   total_bid_cents: number; // deprecated
   total_clicks: number;
   first_reached_bid_at: string; // deprecated
@@ -52,7 +53,7 @@ export const FEATURED_PLANS: Record<PlanType, PlanConfig> = {
     priceCents: 200,
     durationDays: 7,
     priority: 1,
-    description: "Get your project featured on HostWhere for 7 days.",
+    description: "Get your project featured on HostWhere for 7 days. (No Profile Editing)",
   },
   featured: {
     id: "featured",
@@ -60,7 +61,7 @@ export const FEATURED_PLANS: Record<PlanType, PlanConfig> = {
     priceCents: 500,
     durationDays: 14,
     priority: 2,
-    description: "Get higher visibility on HostWhere for 14 days.",
+    description: "Get higher visibility on HostWhere for 14 days. Includes Profile Editing.",
   },
   spotlight: {
     id: "spotlight",
@@ -68,7 +69,7 @@ export const FEATURED_PLANS: Record<PlanType, PlanConfig> = {
     priceCents: 1000,
     durationDays: 30,
     priority: 3,
-    description: "Premium visibility and top placement on HostWhere for 30 days.",
+    description: "Premium visibility and top placement on HostWhere for 30 days. Includes Profile Editing.",
   }
 };
 

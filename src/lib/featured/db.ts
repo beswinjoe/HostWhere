@@ -2,7 +2,7 @@
 // Featured Projects — Database Operations
 // ─────────────────────────────────────────────────────────────
 
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getSupabaseAdminClient } from "@/lib/supabase/server";
 import type {
   FeaturedProject,
   FeaturedProjectWithRank,
@@ -14,7 +14,7 @@ import type {
 // ── Featured Projects ────────────────────────────────────────
 
 export async function getFeaturedProjects(): Promise<FeaturedProjectWithRank[]> {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
 
   const { data, error } = await supabase
     .from("featured_projects")
@@ -39,7 +39,7 @@ export async function getFeaturedProjects(): Promise<FeaturedProjectWithRank[]> 
 export async function getFeaturedProjectByRepo(
   repositoryUrl: string
 ): Promise<FeaturedProject | null> {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
 
   const { data, error } = await supabase
     .from("featured_projects")
@@ -59,7 +59,7 @@ export async function getFeaturedProjectByRepo(
 export async function getFeaturedProjectById(
   id: string
 ): Promise<FeaturedProject | null> {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
 
   const { data, error } = await supabase
     .from("featured_projects")
@@ -84,7 +84,7 @@ export async function createFeaturedProject(project: {
   analysis_result_id?: string;
   owner_id?: string;
 }): Promise<FeaturedProject> {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
 
   const { data, error } = await supabase
     .from("featured_projects")
@@ -118,7 +118,7 @@ export async function activateProjectPlan(
   priority: number,
   durationDays: number
 ): Promise<FeaturedProject> {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
   const current = await getFeaturedProjectById(id);
   if (!current) throw new Error("Project not found.");
 
@@ -174,7 +174,7 @@ export async function activateProjectPlan(
 }
 
 export async function incrementClicks(id: string): Promise<void> {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
 
   // Use RPC or manual increment
   const { error } = await supabase.rpc("increment_clicks", {
@@ -201,7 +201,7 @@ export async function incrementClicks(id: string): Promise<void> {
 export async function getActivityEvents(
   limit: number = 20
 ): Promise<ActivityEvent[]> {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
 
   const { data, error } = await supabase
     .from("activity_events")
@@ -224,7 +224,7 @@ export async function createActivityEvent(event: {
   description: string;
   metadata?: Record<string, unknown>;
 }): Promise<void> {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
 
   const { error } = await supabase.from("activity_events").insert({
     type: event.type,
@@ -247,7 +247,7 @@ export async function createPayment(payment: {
   currency?: string;
   metadata?: Record<string, unknown>;
 }): Promise<Payment> {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
 
   const { data, error } = await supabase
     .from("payments")
@@ -275,7 +275,7 @@ export async function updatePaymentStatus(
   webhookEventId: string,
   providerPaymentId?: string
 ): Promise<Payment> {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
 
   const updateData: Record<string, unknown> = {
     status,
@@ -305,7 +305,7 @@ export async function updatePaymentStatus(
 export async function getPaymentByWebhookEventId(
   eventId: string
 ): Promise<Payment | null> {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
 
   const { data, error } = await supabase
     .from("payments")
@@ -321,7 +321,7 @@ export async function getPaymentByWebhookEventId(
 }
 
 export async function getPaymentById(id: string): Promise<Payment | null> {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
 
   const { data, error } = await supabase
     .from("payments")
@@ -344,7 +344,7 @@ export async function createBid(bid: {
   payment_id: string;
   currency?: string;
 }): Promise<Bid> {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
 
   const { data, error } = await supabase
     .from("bids")
@@ -370,7 +370,7 @@ export async function updateBidStatus(
   id: string,
   status: "completed" | "failed"
 ): Promise<void> {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
 
   const { error } = await supabase
     .from("bids")
@@ -385,7 +385,7 @@ export async function updateBidStatus(
 export async function getBidByPaymentId(
   paymentId: string
 ): Promise<Bid | null> {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
 
   const { data, error } = await supabase
     .from("bids")
@@ -406,7 +406,7 @@ export async function checkRecentClick(
   projectId: string,
   visitorHash: string
 ): Promise<boolean> {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
   const oneMinuteAgo = new Date(Date.now() - 60_000).toISOString();
 
   const { data, error } = await supabase
@@ -429,7 +429,7 @@ export async function recordClick(
   projectId: string,
   visitorHash: string
 ): Promise<void> {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
 
   const { error } = await supabase.from("click_tracking").insert({
     featured_project_id: projectId,
