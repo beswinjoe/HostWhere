@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/auth-client";
 const NAV_LINKS = [
   { label: "Home", href: "/" },
   { label: "Featured", href: "/featured" },
+  { label: "Affiliates", href: "/affiliate" },
   { label: "How it works", href: "/#how-it-works" },
   { label: "Platforms", href: "/#platforms" },
   { label: "Features", href: "/#features" },
@@ -126,6 +127,14 @@ export function Navbar() {
                       <History className="w-4 h-4" />
                       My Analyses
                     </Link>
+                    <Link 
+                      href="/affiliate/dashboard"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-neutral-300 hover:text-white hover:bg-white/5 transition-colors w-full text-left border-t border-white/5"
+                    >
+                      <UserCircle className="w-4 h-4" />
+                      Affiliate Hub
+                    </Link>
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors w-full text-left border-t border-white/5"
@@ -204,6 +213,14 @@ export function Navbar() {
                   >
                     <History className="w-4 h-4" />
                     My Analyses
+                  </Link>
+                  <Link
+                    href="/affiliate/dashboard"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2.5 text-sm text-neutral-300 hover:text-white hover:bg-white/[0.04] rounded-lg transition-colors"
+                  >
+                    <UserCircle className="w-4 h-4" />
+                    Affiliate Hub
                   </Link>
                   <button
                     onClick={handleLogout}

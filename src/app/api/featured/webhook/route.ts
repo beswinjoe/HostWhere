@@ -163,10 +163,13 @@ export async function POST(request: NextRequest) {
         
         const commissionRate = 40; // 40%
         const commissionAmountCents = Math.floor(payment.amount_cents * (commissionRate / 100));
+        
+        const referredUserIdRaw = event.data?.metadata?.referred_user_id;
+        const referredUserId = referredUserIdRaw && referredUserIdRaw !== "" ? referredUserIdRaw : null;
 
         await createAffiliateCommission(
           affiliateUserId,
-          null, // we don't have referred_user_id cleanly here, could optionally pass it in metadata if logged in
+          referredUserId,
           paymentId,
           planConfig.id,
           payment.amount_cents,
@@ -202,8 +205,7 @@ export async function POST(request: NextRequest) {
     return Response.json({ received: true });
   } catch (error) {
     console.error("[Webhook] Unhandled error:", error);
-    // Return 200 even on errors to prevent webhook retries for non-recoverable issues
-    // Log the error for investigation
-    return Response.json({ received: true });
+    // Return 500 to allow Dodo Payments to retry the webhook
+    return Response.json({ error: "Internal processing error." }, { status: 500 });
   }
 }

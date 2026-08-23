@@ -52,12 +52,19 @@ export function HomepageFeaturedProjects() {
               Top community projects currently getting noticed.
             </p>
           </div>
-          <Link href="/featured">
-            <button className="flex items-center gap-2 text-amber-500 hover:text-amber-400 font-medium transition-colors group">
-              View Full Leaderboard
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </button>
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <Link href="/featured">
+              <button className="flex items-center gap-2 text-amber-500 hover:text-amber-400 font-medium transition-colors group">
+                View Full Leaderboard
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </Link>
+            <Link href="/analyze">
+              <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 text-sm font-medium transition-colors">
+                Feature Your Project
+              </button>
+            </Link>
+          </div>
         </div>
       </ScrollReveal>
 

@@ -1,274 +1,283 @@
-import { getAffiliateDashboardData } from "@/lib/affiliate/queries";
-import { Navbar } from "@/components/landing/Navbar";
 import Link from "next/link";
-import { formatCentsToUSD, FEATURED_PLANS, type PlanType } from "@/lib/featured/types";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+import { Navbar } from "@/components/landing/Navbar";
 import {
   Sparkles,
   TrendingUp,
-  MousePointerClick,
-  Users,
   Copy,
   Wallet,
-  Clock,
-  CheckCircle2,
-  XCircle,
   ArrowRight,
+  HelpCircle,
+  CheckCircle2,
+  Clock,
+  ArrowUpRight
 } from "lucide-react";
-import { CopyLinkButton } from "@/components/affiliate/CopyLinkButton";
 
-export default async function AffiliatePage() {
-  const data = await getAffiliateDashboardData();
+export default async function AffiliateLandingPage() {
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return cookieStore.getAll(); },
+        setAll() {},
+      },
+    }
+  );
+  
+  const { data: { user } } = await supabase.auth.getUser();
+  const isAuthenticated = !!user;
 
-  if (!data) {
-    return <AffiliateLandingPage />;
-  }
-
-  const { username, stats, recentCommissions } = data;
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://hostwhere.com";
-  const referralLink = `${baseUrl}/r/${username}`;
+  const ctaLink = isAuthenticated ? "/affiliate/dashboard" : "/signup";
+  const ctaText = isAuthenticated ? "Go to Dashboard" : "Become an Affiliate";
 
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-primary/30 relative overflow-hidden">
+    <div className="min-h-screen bg-black text-white selection:bg-emerald-500/30 relative overflow-hidden">
       <Navbar />
 
       <div className="fixed inset-0 bg-grid z-0 pointer-events-none opacity-40" />
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[800px] bg-primary/5 blur-[120px] rounded-full pointer-events-none z-0" />
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[800px] bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none z-0" />
 
-      <main className="relative z-10 pt-28 pb-24 px-6 max-w-7xl mx-auto">
-        <div className="mb-12 hero-animate">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 backdrop-blur-md mb-6">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-[11px] font-medium tracking-wide uppercase text-primary">
-              Partner Program
+      <main className="relative z-10 pt-32 pb-24 px-6 max-w-5xl mx-auto">
+        {/* ─── Hero Section ─────────────────────────────────────────────── */}
+        <section className="text-center mb-32">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 backdrop-blur-md mb-8 hero-animate">
+            <Sparkles className="w-4 h-4 text-emerald-400" />
+            <span className="text-[11px] font-medium tracking-wide uppercase text-emerald-400">
+              HostWhere Partners
             </span>
           </div>
 
-          <h1 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">
-            Affiliate Dashboard
+          <h1 className="font-display text-5xl md:text-7xl font-extrabold tracking-tight mb-6 hero-animate" style={{ animationDelay: "100ms" }}>
+            Earn <span className="text-emerald-400">40%</span> with HostWhere.
           </h1>
-          <p className="text-lg text-neutral-400">
-            Track your referrals, conversions, and 40% commissions.
-          </p>
-        </div>
-
-        {/* Link Box */}
-        <div className="glass rounded-3xl p-8 mb-12 animate-slide-up" style={{ animationDelay: "100ms" }}>
-          <h2 className="text-xl font-bold mb-4">Your Referral Link</h2>
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <div className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 w-full font-mono text-primary text-sm overflow-x-auto whitespace-nowrap">
-              {referralLink}
-            </div>
-            <CopyLinkButton link={referralLink} />
-          </div>
-          <p className="text-sm text-neutral-400 mt-4">
-            Share this link anywhere. Visitors get a 30-day tracking cookie. You earn 40% when they feature a project.
-          </p>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <StatCard
-            delay={200}
-            title="Total Clicks"
-            value={stats.totalClicks}
-            icon={<MousePointerClick className="w-5 h-5 text-blue-400" />}
-            gradient="from-blue-500/10 to-blue-500/5"
-            border="border-blue-500/20"
-          />
-          <StatCard
-            delay={300}
-            title="Signups"
-            value={stats.totalReferrals}
-            icon={<Users className="w-5 h-5 text-purple-400" />}
-            gradient="from-purple-500/10 to-purple-500/5"
-            border="border-purple-500/20"
-          />
-          <StatCard
-            delay={400}
-            title="Conversions"
-            value={stats.totalConversions}
-            icon={<TrendingUp className="w-5 h-5 text-emerald-400" />}
-            gradient="from-emerald-500/10 to-emerald-500/5"
-            border="border-emerald-500/20"
-          />
-          <StatCard
-            delay={500}
-            title="Total Earned"
-            value={formatCentsToUSD(stats.totalCents)}
-            icon={<Wallet className="w-5 h-5 text-amber-400" />}
-            gradient="from-amber-500/10 to-amber-500/5"
-            border="border-amber-500/20"
-          />
-        </div>
-
-        {/* Earnings Split */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 animate-slide-up" style={{ animationDelay: "600ms" }}>
-          <div className="glass rounded-2xl p-6 border-white/5">
-            <div className="text-sm text-neutral-400 uppercase tracking-wider font-semibold mb-2 flex items-center gap-2">
-              <Clock className="w-4 h-4" /> Pending
-            </div>
-            <div className="text-3xl font-bold">{formatCentsToUSD(stats.pendingCents)}</div>
-            <p className="text-xs text-neutral-500 mt-2">Available 30 days after purchase</p>
-          </div>
-          <div className="glass rounded-2xl p-6 border-emerald-500/20 bg-emerald-500/5">
-            <div className="text-sm text-emerald-400 uppercase tracking-wider font-semibold mb-2 flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4" /> Available
-            </div>
-            <div className="text-3xl font-bold text-white">{formatCentsToUSD(stats.availableCents)}</div>
-            <p className="text-xs text-emerald-500/60 mt-2">Ready for manual payout</p>
-          </div>
-          <div className="glass rounded-2xl p-6 border-white/5">
-            <div className="text-sm text-neutral-400 uppercase tracking-wider font-semibold mb-2 flex items-center gap-2">
-              <Wallet className="w-4 h-4" /> Paid
-            </div>
-            <div className="text-3xl font-bold">{formatCentsToUSD(stats.paidCents)}</div>
-            <p className="text-xs text-neutral-500 mt-2">Historically paid out to you</p>
-          </div>
-        </div>
-
-        {/* Recent Conversions */}
-        <div className="glass rounded-3xl p-8 animate-slide-up" style={{ animationDelay: "700ms" }}>
-          <h2 className="text-xl font-bold mb-6">Recent Conversions</h2>
           
-          {recentCommissions.length === 0 ? (
-            <div className="text-center py-12 border border-white/5 rounded-2xl bg-black/20">
-              <TrendingUp className="w-8 h-8 text-neutral-600 mx-auto mb-3" />
-              <p className="text-neutral-400">No conversions yet.</p>
-              <p className="text-sm text-neutral-500 mt-1">Share your link to get started!</p>
+          <p className="text-xl text-neutral-400 mb-10 max-w-2xl mx-auto hero-animate leading-relaxed font-light" style={{ animationDelay: "200ms" }}>
+            Share HostWhere with creators and developers. Earn a massive 40% commission when your referrals purchase eligible Featured Project plans.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 hero-animate" style={{ animationDelay: "300ms" }}>
+            <Link href={ctaLink} className="w-full sm:w-auto">
+              <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-black rounded-full font-bold text-lg transition-all shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+                {ctaText}
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </Link>
+            <a href="#how-it-works" className="w-full sm:w-auto">
+              <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-full font-semibold transition-all">
+                Learn How It Works
+              </button>
+            </a>
+          </div>
+        </section>
+
+        {/* ─── How It Works ─────────────────────────────────────────────── */}
+        <section id="how-it-works" className="mb-40 scroll-mt-24">
+          <div className="text-center mb-16">
+            <h2 className="font-display text-3xl md:text-4xl font-extrabold mb-4">A simple, transparent flow.</h2>
+            <p className="text-neutral-400">Three steps to start earning recurring commissions.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 relative">
+            <div className="hidden md:block absolute top-12 left-[16%] right-[16%] h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
+
+            <div className="glass p-8 rounded-3xl text-center border-white/5 relative z-10 hover:bg-white/[0.02] transition-colors">
+              <div className="w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-6">
+                <Copy className="w-8 h-8 text-neutral-300" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">1. Get Your Link</h3>
+              <p className="text-neutral-400 text-sm leading-relaxed">
+                Create an account to instantly generate your unique HostWhere referral link.
+              </p>
             </div>
-          ) : (
-            <div className="space-y-4">
-              {recentCommissions.map((commission) => {
-                const planName = FEATURED_PLANS[commission.plan as PlanType]?.name || commission.plan;
-                return (
-                  <div key={commission.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors gap-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-semibold">Someone purchased {planName}</span>
-                      </div>
-                      <div className="text-sm text-neutral-400">
-                        {new Date(commission.created_at).toLocaleDateString()}
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-6 sm:justify-end">
-                      <div className="text-right">
-                        <div className="text-xs text-neutral-500 uppercase font-bold tracking-wider mb-0.5">Commission</div>
-                        <div className="font-bold text-emerald-400">{formatCentsToUSD(commission.commission_amount_cents)}</div>
-                      </div>
-                      
-                      <div className="text-right w-24">
-                        <div className="text-xs text-neutral-500 uppercase font-bold tracking-wider mb-0.5">Status</div>
-                        <StatusBadge status={commission.status} />
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+            
+            <div className="glass p-8 rounded-3xl text-center border-white/5 relative z-10 hover:bg-white/[0.02] transition-colors">
+              <div className="w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-6">
+                <TrendingUp className="w-8 h-8 text-neutral-300" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">2. Share HostWhere</h3>
+              <p className="text-neutral-400 text-sm leading-relaxed">
+                Share HostWhere with creators, developers, and project owners. Visitors are tracked for 30 days.
+              </p>
             </div>
-          )}
-        </div>
-      </main>
-    </div>
-  );
-}
+            
+            <div className="glass p-8 rounded-3xl text-center border-emerald-500/20 bg-emerald-500/5 relative z-10">
+              <div className="w-20 h-20 rounded-2xl bg-emerald-500/20 flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+                <Wallet className="w-8 h-8 text-emerald-400" />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-white">3. Earn 40%</h3>
+              <p className="text-neutral-300 text-sm leading-relaxed">
+                Earn 40% commission on every eligible successful Featured Project purchase.
+              </p>
+            </div>
+          </div>
+        </section>
 
-interface StatCardProps {
-  title: string;
-  value: string | number;
-  icon: React.ReactNode;
-  gradient: string;
-  border: string;
-  delay: number;
-}
+        {/* ─── Commission Examples ───────────────────────────────────────── */}
+        <section className="mb-40">
+          <div className="text-center mb-16">
+            <h2 className="font-display text-3xl md:text-4xl font-extrabold mb-4">What you can earn.</h2>
+            <p className="text-neutral-400">Clear, fixed 40% rates on all eligible plans.</p>
+          </div>
 
-function StatCard({ title, value, icon, gradient, border, delay }: StatCardProps) {
-  return (
-    <div className={`glass rounded-2xl p-6 border ${border} bg-gradient-to-br ${gradient} animate-slide-up`} style={{ animationDelay: `${delay}ms` }}>
-      <div className="w-10 h-10 rounded-xl bg-black/30 flex items-center justify-center mb-4">
-        {icon}
-      </div>
-      <div className="text-neutral-400 text-sm font-semibold uppercase tracking-wider mb-1">{title}</div>
-      <div className="text-3xl font-bold">{value}</div>
-    </div>
-  );
-}
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="glass p-8 rounded-3xl border border-white/10">
+              <div className="text-neutral-400 uppercase tracking-widest text-xs font-bold mb-4">Boost Plan</div>
+              <div className="flex items-baseline gap-2 mb-2">
+                <span className="text-2xl font-semibold text-neutral-500 line-through decoration-neutral-500/50">$2</span>
+                <span className="text-sm text-neutral-500">purchase</span>
+              </div>
+              <div className="pt-4 mt-4 border-t border-white/10">
+                <div className="text-sm text-emerald-500 font-medium mb-1">You earn</div>
+                <div className="text-4xl font-extrabold text-emerald-400">$0.80</div>
+              </div>
+            </div>
 
-function StatusBadge({ status }: { status: string }) {
-  switch (status) {
-    case "pending":
-      return <span className="text-amber-400 text-sm font-medium flex items-center gap-1 justify-end"><Clock className="w-3.5 h-3.5" /> Pending</span>;
-    case "available":
-      return <span className="text-emerald-400 text-sm font-medium flex items-center gap-1 justify-end"><CheckCircle2 className="w-3.5 h-3.5" /> Available</span>;
-    case "paid":
-      return <span className="text-blue-400 text-sm font-medium flex items-center gap-1 justify-end"><Wallet className="w-3.5 h-3.5" /> Paid</span>;
-    case "reversed":
-    case "cancelled":
-      return <span className="text-red-400 text-sm font-medium flex items-center gap-1 justify-end"><XCircle className="w-3.5 h-3.5" /> {status}</span>;
-    default:
-      return <span className="text-neutral-400 text-sm font-medium">{status}</span>;
-  }
-}
+            <div className="glass p-8 rounded-3xl border border-emerald-500/30 bg-emerald-500/5 transform md:-translate-y-4">
+              <div className="text-emerald-400 uppercase tracking-widest text-xs font-bold mb-4">Featured Plan</div>
+              <div className="flex items-baseline gap-2 mb-2">
+                <span className="text-2xl font-semibold text-neutral-500 line-through decoration-neutral-500/50">$5</span>
+                <span className="text-sm text-neutral-500">purchase</span>
+              </div>
+              <div className="pt-4 mt-4 border-t border-emerald-500/20">
+                <div className="text-sm text-emerald-500 font-medium mb-1">You earn</div>
+                <div className="text-4xl font-extrabold text-emerald-400">$2.00</div>
+              </div>
+            </div>
 
-function AffiliateLandingPage() {
-  return (
-    <div className="min-h-screen bg-black text-white selection:bg-primary/30 relative overflow-hidden">
-      <Navbar />
+            <div className="glass p-8 rounded-3xl border border-white/10">
+              <div className="text-neutral-400 uppercase tracking-widest text-xs font-bold mb-4">Spotlight Plan</div>
+              <div className="flex items-baseline gap-2 mb-2">
+                <span className="text-2xl font-semibold text-neutral-500 line-through decoration-neutral-500/50">$10</span>
+                <span className="text-sm text-neutral-500">purchase</span>
+              </div>
+              <div className="pt-4 mt-4 border-t border-white/10">
+                <div className="text-sm text-emerald-500 font-medium mb-1">You earn</div>
+                <div className="text-4xl font-extrabold text-emerald-400">$4.00</div>
+              </div>
+            </div>
+          </div>
+        </section>
 
-      <div className="fixed inset-0 bg-grid z-0 pointer-events-none opacity-40" />
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[800px] bg-primary/5 blur-[120px] rounded-full pointer-events-none z-0" />
+        {/* ─── Status Flow ──────────────────────────────────────────────── */}
+        <section className="mb-40 max-w-4xl mx-auto">
+          <div className="glass p-10 rounded-3xl border-white/5 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[80px] rounded-full pointer-events-none" />
+            
+            <h2 className="font-display text-2xl md:text-3xl font-bold mb-10 text-center">Payout Lifecycle</h2>
+            
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+              <div className="flex-1 flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mb-4">
+                  <Clock className="w-5 h-5" />
+                </div>
+                <h4 className="font-bold text-white mb-1">Pending</h4>
+                <p className="text-xs text-neutral-400">Held for 30 days to prevent refunds or fraud.</p>
+              </div>
+              
+              <div className="hidden md:block w-8 h-px bg-white/20" />
+              
+              <div className="flex-1 flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4">
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+                <h4 className="font-bold text-white mb-1">Available</h4>
+                <p className="text-xs text-neutral-400">Funds have cleared the holding period.</p>
+              </div>
+              
+              <div className="hidden md:block w-8 h-px bg-white/20" />
+              
+              <div className="flex-1 flex flex-col items-center text-center opacity-70">
+                <div className="w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center mb-4">
+                  <ArrowUpRight className="w-5 h-5" />
+                </div>
+                <h4 className="font-bold text-white mb-1">Request Payout</h4>
+                <p className="text-xs text-neutral-400">Currently processed manually upon request.</p>
+              </div>
+              
+              <div className="hidden md:block w-8 h-px bg-white/20 opacity-70" />
+              
+              <div className="flex-1 flex flex-col items-center text-center opacity-70">
+                <div className="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center mb-4">
+                  <Wallet className="w-5 h-5" />
+                </div>
+                <h4 className="font-bold text-white mb-1">Paid</h4>
+                <p className="text-xs text-neutral-400">Commission has been successfully sent to you.</p>
+              </div>
+            </div>
 
-      <main className="relative z-10 pt-32 pb-24 px-6 max-w-4xl mx-auto text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 backdrop-blur-md mb-8 hero-animate">
-          <Sparkles className="w-4 h-4 text-primary" />
-          <span className="text-[11px] font-medium tracking-wide uppercase text-primary">
-            HostWhere Partners
-          </span>
-        </div>
+            <div className="mt-12 p-4 bg-white/[0.03] border border-white/10 rounded-xl text-center">
+              <p className="text-sm text-neutral-400 flex items-center justify-center gap-2">
+                <HelpCircle className="w-4 h-4 text-neutral-500" />
+                Note: Automated payouts via Stripe/PayPal are not yet enabled. Payouts are manually reviewed and processed by admin.
+              </p>
+            </div>
+          </div>
+        </section>
 
-        <h1 className="font-display text-5xl sm:text-7xl font-extrabold tracking-tight mb-6 hero-animate" style={{ animationDelay: "100ms" }}>
-          Earn <span className="text-emerald-400">40%</span> by referring creators.
-        </h1>
-        
-        <p className="text-xl text-neutral-400 mb-12 max-w-2xl mx-auto hero-animate leading-relaxed" style={{ animationDelay: "200ms" }}>
-          Join the HostWhere Partner Program. Share your unique link, help creators discover the best hosting for their projects, and earn a generous 40% commission on all Featured Project placements.
-        </p>
+        {/* ─── FAQ ──────────────────────────────────────────────────────── */}
+        <section className="mb-32 max-w-3xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="font-display text-3xl font-extrabold mb-4">Frequently Asked Questions</h2>
+          </div>
 
-        <div className="hero-animate" style={{ animationDelay: "300ms" }}>
-          <Link href="/signup">
-            <button className="cta-glow px-8 py-4 bg-white text-black hover:bg-neutral-200 rounded-full font-bold text-lg transition-all flex items-center gap-2 mx-auto">
-              Start Earning Now
+          <div className="space-y-6">
+            <div className="glass p-6 rounded-2xl border-white/5">
+              <h4 className="font-bold text-lg mb-2 text-white">Who can join the affiliate program?</h4>
+              <p className="text-neutral-400 text-sm leading-relaxed">
+                Anyone with a HostWhere account! As soon as you sign up, your unique referral link is generated and ready to use in your dashboard.
+              </p>
+            </div>
+            
+            <div className="glass p-6 rounded-2xl border-white/5">
+              <h4 className="font-bold text-lg mb-2 text-white">How much commission do I earn?</h4>
+              <p className="text-neutral-400 text-sm leading-relaxed">
+                You earn a flat 40% commission on every eligible purchase. For example, a $10 Spotlight plan earns you $4.00.
+              </p>
+            </div>
+
+            <div className="glass p-6 rounded-2xl border-white/5">
+              <h4 className="font-bold text-lg mb-2 text-white">When does commission become available?</h4>
+              <p className="text-neutral-400 text-sm leading-relaxed">
+                To protect against fraud and refunds, all commissions remain in a &quot;Pending&quot; state for 30 days after the purchase. Once cleared, they become &quot;Available&quot;.
+              </p>
+            </div>
+
+            <div className="glass p-6 rounded-2xl border-white/5">
+              <h4 className="font-bold text-lg mb-2 text-white">How do payouts work?</h4>
+              <p className="text-neutral-400 text-sm leading-relaxed">
+                Currently, payouts are handled manually by the HostWhere admin team. Automated self-serve payouts are on our roadmap.
+              </p>
+            </div>
+
+            <div className="glass p-6 rounded-2xl border-white/5">
+              <h4 className="font-bold text-lg mb-2 text-white">Can I refer myself?</h4>
+              <p className="text-neutral-400 text-sm leading-relaxed">
+                No, self-referrals are strictly prohibited. The system will not generate commissions if the buyer and the affiliate are the same user.
+              </p>
+            </div>
+
+            <div className="glass p-6 rounded-2xl border-white/5">
+              <h4 className="font-bold text-lg mb-2 text-white">Which purchases are eligible?</h4>
+              <p className="text-neutral-400 text-sm leading-relaxed">
+                Any successful purchase of the Boost, Featured, or Spotlight plans made by a user within 30 days of clicking your referral link.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ─── Bottom CTA ───────────────────────────────────────────────── */}
+        <section className="text-center">
+          <Link href={ctaLink}>
+            <button className="cta-glow px-10 py-5 bg-white text-black hover:bg-neutral-200 rounded-full font-bold text-lg transition-all flex items-center justify-center gap-2 mx-auto">
+              {ctaText}
               <ArrowRight className="w-5 h-5" />
             </button>
           </Link>
-          <p className="mt-4 text-sm text-neutral-500">
-            Already have an account? <Link href="/login" className="text-primary hover:underline">Log in to view your dashboard</Link>
-          </p>
-        </div>
+        </section>
 
-        <div className="grid sm:grid-cols-3 gap-8 mt-24 hero-animate" style={{ animationDelay: "400ms" }}>
-          <div className="glass p-8 rounded-3xl text-left border-white/5">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
-              <Copy className="w-6 h-6 text-primary" />
-            </div>
-            <h3 className="text-lg font-bold mb-2">1. Share Your Link</h3>
-            <p className="text-neutral-400 text-sm leading-relaxed">Get a unique referral link automatically when you create an account.</p>
-          </div>
-          <div className="glass p-8 rounded-3xl text-left border-white/5">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-6">
-              <TrendingUp className="w-6 h-6 text-emerald-400" />
-            </div>
-            <h3 className="text-lg font-bold mb-2">2. Creators Feature Projects</h3>
-            <p className="text-neutral-400 text-sm leading-relaxed">Visitors discover HostWhere and purchase Featured placement plans.</p>
-          </div>
-          <div className="glass p-8 rounded-3xl text-left border-white/5">
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-6">
-              <Wallet className="w-6 h-6 text-amber-400" />
-            </div>
-            <h3 className="text-lg font-bold mb-2">3. Earn 40%</h3>
-            <p className="text-neutral-400 text-sm leading-relaxed">You get 40% of the sale. Monitor your earnings directly in the dashboard.</p>
-          </div>
-        </div>
       </main>
     </div>
   );

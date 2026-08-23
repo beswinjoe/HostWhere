@@ -132,6 +132,7 @@ export async function POST(request: NextRequest) {
         project_name: body.project_name,
         plan: body.plan,
         affiliate_user_id: affiliateUserId || "",
+        referred_user_id: user?.id || "",
       },
       returnUrl: `${baseUrl}/featured/success?payment_id=${payment.id}&project_id=${project.id}`,
     });
