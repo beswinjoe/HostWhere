@@ -31,12 +31,12 @@ describe('Webhook Route', () => {
     vi.clearAllMocks();
     
     // Default mocks
-    (getPaymentByWebhookEventId as any).mockResolvedValue(null);
-    (getPaymentById as any).mockResolvedValue({ id: 'pay_123', status: 'pending', amount_cents: 200 });
-    (getFeaturedProjectById as any).mockResolvedValue({ id: 'proj_123', featured_active: false });
+    (getPaymentByWebhookEventId as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+    (getPaymentById as ReturnType<typeof vi.fn>).mockResolvedValue({ id: 'pay_123', status: 'pending', amount_cents: 200 });
+    (getFeaturedProjectById as ReturnType<typeof vi.fn>).mockResolvedValue({ id: 'proj_123', featured_active: false });
   });
 
-  const createMockRequest = (body: any) => {
+  const createMockRequest = (body: unknown) => {
     return new NextRequest('http://localhost:3000/api/featured/webhook', {
       method: 'POST',
       body: JSON.stringify(body),
@@ -49,7 +49,7 @@ describe('Webhook Route', () => {
   };
 
   it('rejects if plan metadata is missing', async () => {
-    (verifyAndParseWebhook as any).mockReturnValue({
+    (verifyAndParseWebhook as ReturnType<typeof vi.fn>).mockReturnValue({
       type: 'payment.succeeded',
       data: {
         metadata: {
@@ -70,7 +70,7 @@ describe('Webhook Route', () => {
   });
 
   it('activates Boost plan correctly', async () => {
-    (verifyAndParseWebhook as any).mockReturnValue({
+    (verifyAndParseWebhook as ReturnType<typeof vi.fn>).mockReturnValue({
       type: 'payment.succeeded',
       data: {
         metadata: {
@@ -89,7 +89,7 @@ describe('Webhook Route', () => {
   });
 
   it('activates Featured plan correctly', async () => {
-    (verifyAndParseWebhook as any).mockReturnValue({
+    (verifyAndParseWebhook as ReturnType<typeof vi.fn>).mockReturnValue({
       type: 'payment.succeeded',
       data: {
         metadata: {
@@ -108,7 +108,7 @@ describe('Webhook Route', () => {
   });
 
   it('activates Spotlight plan correctly', async () => {
-    (verifyAndParseWebhook as any).mockReturnValue({
+    (verifyAndParseWebhook as ReturnType<typeof vi.fn>).mockReturnValue({
       type: 'payment.succeeded',
       data: {
         metadata: {
@@ -127,7 +127,7 @@ describe('Webhook Route', () => {
   });
 
   it('parses nested metadata correctly', async () => {
-    (verifyAndParseWebhook as any).mockReturnValue({
+    (verifyAndParseWebhook as ReturnType<typeof vi.fn>).mockReturnValue({
       type: 'payment.succeeded',
       data: {
         payment: {
@@ -145,5 +145,43 @@ describe('Webhook Route', () => {
     
     expect(res.status).toBe(200);
     expect(activateProjectPlan).toHaveBeenCalledWith('proj_123', 'featured', 500, 2, 14);
+  });
+
+  it('returns 500 if activateProjectPlan fails', async () => {
+    (verifyAndParseWebhook as ReturnType<typeof vi.fn>).mockReturnValue({
+      type: 'payment.succeeded',
+      data: {
+        metadata: {
+          payment_id: 'pay_123',
+          featured_project_id: 'proj_123',
+          plan: 'boost'
+        }
+      }
+    });
+
+    (activateProjectPlan as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('DB failure'));
+
+    const req = createMockRequest({});
+    const res = await POST(req);
+    
+    expect(res.status).toBe(500);
+    // Ensure updatePaymentStatus is NOT called on failure
+    const { updatePaymentStatus } = await import('@/lib/featured/db');
+    expect(updatePaymentStatus).not.toHaveBeenCalled();
+  });
+
+  it('safely handles duplicate successful webhooks', async () => {
+    (verifyAndParseWebhook as ReturnType<typeof vi.fn>).mockReturnValue({
+      type: 'payment.succeeded',
+      data: { metadata: { payment_id: 'pay_already_success', plan: 'boost' } }
+    });
+
+    (getPaymentById as ReturnType<typeof vi.fn>).mockResolvedValue({ id: 'pay_already_success', status: 'succeeded' });
+
+    const req = createMockRequest({});
+    const res = await POST(req);
+    
+    expect(res.status).toBe(200);
+    expect(activateProjectPlan).not.toHaveBeenCalled();
   });
 });

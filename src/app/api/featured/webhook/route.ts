@@ -108,24 +108,9 @@ export async function POST(request: NextRequest) {
         return Response.json({ received: true });
       }
 
-      // Update payment status
-      await updatePaymentStatus(
-        paymentId,
-        "succeeded",
-        webhookId,
-        providerPaymentId || undefined
-      );
+      // Wait to update payment status until the end to ensure idempotency is preserved if activation fails
 
-      // Update bid status
-      if (bidId) {
-        await updateBidStatus(bidId, "completed");
-      } else {
-        // Try to find bid by payment ID
-        const bid = await getBidByPaymentId(paymentId);
-        if (bid) {
-          await updateBidStatus(bid.id, "completed");
-        }
-      }
+
 
       // Update project plan
       if (featuredProjectId) {
@@ -139,18 +124,14 @@ export async function POST(request: NextRequest) {
 
           console.log(`[Webhook] Project status flags -> isNew: ${isNewProject}, isUpgrade: ${isUpgrade}`);
 
-          try {
-            await activateProjectPlan(
-              featuredProjectId,
-              planConfig.id,
-              planConfig.priceCents,
-              planConfig.priority,
-              planConfig.durationDays
-            );
-            console.log(`[Webhook] Successfully ran activateProjectPlan for project ${featuredProjectId}`);
-          } catch (actErr) {
-            console.error(`[Webhook] Error in activateProjectPlan:`, actErr);
-          }
+          await activateProjectPlan(
+            featuredProjectId,
+            planConfig.id,
+            planConfig.priceCents,
+            planConfig.priority,
+            planConfig.durationDays
+          );
+          console.log(`[Webhook] Successfully ran activateProjectPlan for project ${featuredProjectId}`);
 
           // Create activity event
           if (isNewProject) {
@@ -200,6 +181,25 @@ export async function POST(request: NextRequest) {
           commissionAmountCents
         );
       }
+
+      // Update bid status
+      if (bidId) {
+        await updateBidStatus(bidId, "completed");
+      } else {
+        // Try to find bid by payment ID
+        const bid = await getBidByPaymentId(paymentId);
+        if (bid) {
+          await updateBidStatus(bid.id, "completed");
+        }
+      }
+
+      // Update payment status (MARK AS FULLY COMPLETED)
+      await updatePaymentStatus(
+        paymentId,
+        "succeeded",
+        webhookId,
+        providerPaymentId || undefined
+      );
 
       console.log(`[Webhook] Successfully processed payment ${paymentId}`);
     }
