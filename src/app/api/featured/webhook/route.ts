@@ -65,8 +65,9 @@ export async function POST(request: NextRequest) {
     console.log(`[Webhook] Event data payload type:`, event.data?.payload_type);
     console.log(`[Webhook] Event data keys:`, Object.keys(event.data || {}));
     
-    // Check if metadata exists on data or nested somewhere else
-    const metadata = event.data?.metadata || (event.data as any)?.payment?.metadata;
+    const eventData = event.data as Record<string, unknown>;
+    const paymentData = eventData?.payment as Record<string, unknown> | undefined;
+    const metadata = (event.data?.metadata as Record<string, string>) || (paymentData?.metadata as Record<string, string>);
     console.log(`[Webhook] Metadata available:`, !!metadata, metadata);
 
     // ── Handle payment.succeeded ──────────────────────────
@@ -75,13 +76,24 @@ export async function POST(request: NextRequest) {
       const bidId = metadata?.bid_id;
       const featuredProjectId = metadata?.featured_project_id;
       const providerPaymentId = event.data?.payment_id;
+      const planStr = metadata?.plan as PlanType | undefined;
 
-      console.log(`[Webhook] Succeeded Event Parsed IDs -> Payment: ${paymentId}, Project: ${featuredProjectId}`);
+      console.log(`[Webhook] Succeeded Event Parsed IDs -> Payment: ${paymentId}, Project: ${featuredProjectId}, Plan: ${planStr}`);
 
       if (!paymentId) {
         console.error("[Webhook] Missing payment_id in metadata");
         return Response.json({ received: true }); // Acknowledge but can't process
       }
+
+      if (!planStr || !FEATURED_PLANS[planStr]) {
+        console.error("[Webhook] Missing or invalid plan metadata");
+        return Response.json(
+          { error: "Missing or invalid plan metadata" },
+          { status: 500 }
+        );
+      }
+
+      const planConfig = FEATURED_PLANS[planStr];
 
       // Verify our payment record exists
       const payment = await getPaymentById(paymentId);
@@ -117,9 +129,6 @@ export async function POST(request: NextRequest) {
 
       // Update project plan
       if (featuredProjectId) {
-        const planStr = event.data?.metadata?.plan as PlanType;
-        const planConfig = FEATURED_PLANS[planStr] || FEATURED_PLANS.boost;
-
         // Get the project's state before update
         const projectBefore = await getFeaturedProjectById(featuredProjectId);
         console.log(`[Webhook] Fetched project before activation:`, !!projectBefore, projectBefore?.id);
@@ -173,15 +182,12 @@ export async function POST(request: NextRequest) {
       }
 
       // ── Affiliate Commission ──────────────────────────────
-      const affiliateUserId = event.data?.metadata?.affiliate_user_id;
+      const affiliateUserId = metadata?.affiliate_user_id;
       if (affiliateUserId && affiliateUserId !== "") {
-        const planStr = event.data?.metadata?.plan as PlanType;
-        const planConfig = FEATURED_PLANS[planStr] || FEATURED_PLANS.boost;
-        
         const commissionRate = 40; // 40%
         const commissionAmountCents = Math.floor(payment.amount_cents * (commissionRate / 100));
         
-        const referredUserIdRaw = event.data?.metadata?.referred_user_id;
+        const referredUserIdRaw = metadata?.referred_user_id;
         const referredUserId = referredUserIdRaw && referredUserIdRaw !== "" ? referredUserIdRaw : null;
 
         await createAffiliateCommission(
@@ -200,7 +206,7 @@ export async function POST(request: NextRequest) {
 
     // ── Handle payment.failed ────────────────────────────
     if (event.type === "payment.failed" || event.type === "payment.cancelled") {
-      const paymentId = event.data?.metadata?.payment_id;
+      const paymentId = metadata?.payment_id;
 
       if (paymentId) {
         const payment = await getPaymentById(paymentId);

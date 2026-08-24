@@ -55,7 +55,6 @@ export async function createCheckoutSession(
       {
         product_id: finalProductId,
         quantity: 1,
-        amount: params.amountCents, // Override price with bid amount in cents
       },
     ],
     return_url: params.returnUrl,
