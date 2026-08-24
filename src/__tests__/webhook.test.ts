@@ -85,7 +85,7 @@ describe('Webhook Route', () => {
     const res = await POST(req);
     
     expect(res.status).toBe(200);
-    expect(activateProjectPlan).toHaveBeenCalledWith('proj_123', 'boost', 200, 1, 7);
+    expect(activateProjectPlan).toHaveBeenCalledWith('proj_123', 'boost', 200, 1, 7, 'pay_123');
   });
 
   it('activates Featured plan correctly', async () => {
@@ -100,11 +100,13 @@ describe('Webhook Route', () => {
       }
     });
 
+    (getFeaturedProjectById as ReturnType<typeof vi.fn>).mockResolvedValue({ id: 'proj_123', featured_active: false });
+
     const req = createMockRequest({});
     const res = await POST(req);
     
     expect(res.status).toBe(200);
-    expect(activateProjectPlan).toHaveBeenCalledWith('proj_123', 'featured', 500, 2, 14);
+    expect(activateProjectPlan).toHaveBeenCalledWith('proj_123', 'featured', 500, 2, 14, 'pay_123');
   });
 
   it('activates Spotlight plan correctly', async () => {
@@ -119,11 +121,13 @@ describe('Webhook Route', () => {
       }
     });
 
+    (getFeaturedProjectById as ReturnType<typeof vi.fn>).mockResolvedValue({ id: 'proj_123', featured_active: false });
+
     const req = createMockRequest({});
     const res = await POST(req);
     
     expect(res.status).toBe(200);
-    expect(activateProjectPlan).toHaveBeenCalledWith('proj_123', 'spotlight', 1000, 3, 30);
+    expect(activateProjectPlan).toHaveBeenCalledWith('proj_123', 'spotlight', 1000, 3, 30, 'pay_123');
   });
 
   it('parses nested metadata correctly', async () => {
@@ -144,7 +148,7 @@ describe('Webhook Route', () => {
     const res = await POST(req);
     
     expect(res.status).toBe(200);
-    expect(activateProjectPlan).toHaveBeenCalledWith('proj_123', 'featured', 500, 2, 14);
+    expect(activateProjectPlan).toHaveBeenCalledWith('proj_123', 'featured', 500, 2, 14, 'pay_123');
   });
 
   it('returns 500 if activateProjectPlan fails', async () => {
@@ -170,7 +174,55 @@ describe('Webhook Route', () => {
     expect(updatePaymentStatus).not.toHaveBeenCalled();
   });
 
-  it('safely handles duplicate successful webhooks', async () => {
+  it('TEST A: returns 500 if project does not exist', async () => {
+    (verifyAndParseWebhook as ReturnType<typeof vi.fn>).mockReturnValue({
+      type: 'payment.succeeded',
+      data: {
+        metadata: {
+          payment_id: 'pay_123',
+          featured_project_id: 'proj_missing',
+          plan: 'boost'
+        }
+      }
+    });
+
+    (getFeaturedProjectById as ReturnType<typeof vi.fn>).mockResolvedValue(null); // Missing project
+
+    const req = createMockRequest({});
+    const res = await POST(req);
+    
+    expect(res.status).toBe(500);
+    expect(activateProjectPlan).not.toHaveBeenCalled();
+    const { updatePaymentStatus } = await import('@/lib/featured/db');
+    expect(updatePaymentStatus).not.toHaveBeenCalled();
+  });
+
+  it('TEST B/C: returns 500 if a later step like createActivityEvent fails, preventing payment success', async () => {
+    (verifyAndParseWebhook as ReturnType<typeof vi.fn>).mockReturnValue({
+      type: 'payment.succeeded',
+      data: {
+        metadata: {
+          payment_id: 'pay_123',
+          featured_project_id: 'proj_123',
+          plan: 'boost'
+        }
+      }
+    });
+
+    (getFeaturedProjectById as ReturnType<typeof vi.fn>).mockResolvedValue({ id: 'proj_123', featured_active: false });
+    const { createActivityEvent } = await import('@/lib/featured/db');
+    (createActivityEvent as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Activity DB failure'));
+
+    const req = createMockRequest({});
+    const res = await POST(req);
+    
+    expect(res.status).toBe(500);
+    expect(activateProjectPlan).toHaveBeenCalled(); // Ran successfully
+    const { updatePaymentStatus } = await import('@/lib/featured/db');
+    expect(updatePaymentStatus).not.toHaveBeenCalled(); // But payment was NOT marked succeeded
+  });
+
+  it('TEST D: safely handles duplicate successful webhooks', async () => {
     (verifyAndParseWebhook as ReturnType<typeof vi.fn>).mockReturnValue({
       type: 'payment.succeeded',
       data: { metadata: { payment_id: 'pay_already_success', plan: 'boost' } }

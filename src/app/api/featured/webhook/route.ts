@@ -113,25 +113,32 @@ export async function POST(request: NextRequest) {
 
 
       // Update project plan
-      if (featuredProjectId) {
-        // Get the project's state before update
-        const projectBefore = await getFeaturedProjectById(featuredProjectId);
-        console.log(`[Webhook] Fetched project before activation:`, !!projectBefore, projectBefore?.id);
-        
-        if (projectBefore) {
-          const isNewProject = !projectBefore.featured_active || (projectBefore.expires_at && new Date(projectBefore.expires_at) < new Date());
-          const isUpgrade = projectBefore.featured_active && (projectBefore.priority || 0) < planConfig.priority;
+      if (!featuredProjectId) {
+        throw new Error(`[Webhook] Missing featured_project_id in metadata for payment ${paymentId}`);
+      }
 
-          console.log(`[Webhook] Project status flags -> isNew: ${isNewProject}, isUpgrade: ${isUpgrade}`);
+      // Get the project's state before update
+      const projectBefore = await getFeaturedProjectById(featuredProjectId);
+      console.log(`[Webhook] Fetched project before activation:`, !!projectBefore, projectBefore?.id);
+      
+      if (!projectBefore) {
+        throw new Error(`[Webhook] Project ${featuredProjectId} not found in database for payment ${paymentId}`);
+      }
 
-          await activateProjectPlan(
-            featuredProjectId,
-            planConfig.id,
-            planConfig.priceCents,
-            planConfig.priority,
-            planConfig.durationDays
-          );
-          console.log(`[Webhook] Successfully ran activateProjectPlan for project ${featuredProjectId}`);
+      const isNewProject = !projectBefore.featured_active || (projectBefore.expires_at && new Date(projectBefore.expires_at) < new Date());
+      const isUpgrade = projectBefore.featured_active && (projectBefore.priority || 0) < planConfig.priority;
+
+      console.log(`[Webhook] Project status flags -> isNew: ${isNewProject}, isUpgrade: ${isUpgrade}`);
+
+      await activateProjectPlan(
+        featuredProjectId,
+        planConfig.id,
+        planConfig.priceCents,
+        planConfig.priority,
+        planConfig.durationDays,
+        paymentId
+      );
+      console.log(`[Webhook] Successfully ran activateProjectPlan for project ${featuredProjectId}`);
 
           // Create activity event
           if (isNewProject) {
@@ -159,8 +166,7 @@ export async function POST(request: NextRequest) {
               metadata: { plan: planConfig.id },
             });
           }
-        }
-      }
+
 
       // ── Affiliate Commission ──────────────────────────────
       const affiliateUserId = metadata?.affiliate_user_id;

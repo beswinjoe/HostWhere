@@ -97,8 +97,12 @@ export async function createAffiliateCommission(
     .single();
 
   if (error) {
+    if (error.code === '23505') { // Postgres unique_violation
+      console.log(`[Affiliate] Commission already exists for payment ${paymentId}`);
+      return null;
+    }
     console.error("Error creating affiliate commission:", error);
-    return null;
+    throw new Error("Failed to create affiliate commission");
   }
   
   return data;

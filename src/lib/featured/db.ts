@@ -116,11 +116,21 @@ export async function activateProjectPlan(
   plan: string,
   priceCents: number,
   priority: number,
-  durationDays: number
+  durationDays: number,
+  paymentId: string
 ): Promise<FeaturedProject> {
   const supabase = getSupabaseAdminClient();
   const current = await getFeaturedProjectById(id);
   if (!current) throw new Error("Project not found.");
+
+  // ── Idempotency Check ──────────────────────────────────────
+  const socialLinks = (current.social_links as Record<string, unknown>) || {};
+  const processedPayments = (socialLinks._processed_payments as string[]) || [];
+  if (processedPayments.includes(paymentId)) {
+    console.log(`[Featured DB] Project ${id} already activated for payment ${paymentId}`);
+    return current;
+  }
+  // ───────────────────────────────────────────────────────────
 
   const now = new Date();
   
@@ -160,6 +170,10 @@ export async function activateProjectPlan(
       expires_at: newExpiresAt.toISOString(),
       featured_active: true,
       updated_at: now.toISOString(),
+      social_links: {
+        ...socialLinks,
+        _processed_payments: [...processedPayments, paymentId]
+      }
     })
     .eq("id", id)
     .select()
@@ -225,6 +239,21 @@ export async function createActivityEvent(event: {
   metadata?: Record<string, unknown>;
 }): Promise<void> {
   const supabase = getSupabaseAdminClient();
+
+  // Check for idempotency if payment_id is provided
+  if (event.metadata?.payment_id) {
+    const { data: existing } = await supabase
+      .from("activity_events")
+      .select("id")
+      .eq("featured_project_id", event.featured_project_id)
+      .contains("metadata", { payment_id: event.metadata.payment_id })
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      console.log(`[Featured DB] Activity event already exists for payment ${event.metadata.payment_id}`);
+      return;
+    }
+  }
 
   const { error } = await supabase.from("activity_events").insert({
     type: event.type,
