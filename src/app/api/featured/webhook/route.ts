@@ -62,13 +62,21 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`[Webhook] Received event: ${event.type}`);
+    console.log(`[Webhook] Event data payload type:`, event.data?.payload_type);
+    console.log(`[Webhook] Event data keys:`, Object.keys(event.data || {}));
+    
+    // Check if metadata exists on data or nested somewhere else
+    const metadata = event.data?.metadata || (event.data as any)?.payment?.metadata;
+    console.log(`[Webhook] Metadata available:`, !!metadata, metadata);
 
     // ── Handle payment.succeeded ──────────────────────────
     if (event.type === "payment.succeeded") {
-      const paymentId = event.data?.metadata?.payment_id;
-      const bidId = event.data?.metadata?.bid_id;
-      const featuredProjectId = event.data?.metadata?.featured_project_id;
+      const paymentId = metadata?.payment_id;
+      const bidId = metadata?.bid_id;
+      const featuredProjectId = metadata?.featured_project_id;
       const providerPaymentId = event.data?.payment_id;
+
+      console.log(`[Webhook] Succeeded Event Parsed IDs -> Payment: ${paymentId}, Project: ${featuredProjectId}`);
 
       if (!paymentId) {
         console.error("[Webhook] Missing payment_id in metadata");
@@ -114,17 +122,26 @@ export async function POST(request: NextRequest) {
 
         // Get the project's state before update
         const projectBefore = await getFeaturedProjectById(featuredProjectId);
+        console.log(`[Webhook] Fetched project before activation:`, !!projectBefore, projectBefore?.id);
+        
         if (projectBefore) {
           const isNewProject = !projectBefore.featured_active || (projectBefore.expires_at && new Date(projectBefore.expires_at) < new Date());
           const isUpgrade = projectBefore.featured_active && (projectBefore.priority || 0) < planConfig.priority;
 
-          await activateProjectPlan(
-            featuredProjectId,
-            planConfig.id,
-            planConfig.priceCents,
-            planConfig.priority,
-            planConfig.durationDays
-          );
+          console.log(`[Webhook] Project status flags -> isNew: ${isNewProject}, isUpgrade: ${isUpgrade}`);
+
+          try {
+            await activateProjectPlan(
+              featuredProjectId,
+              planConfig.id,
+              planConfig.priceCents,
+              planConfig.priority,
+              planConfig.durationDays
+            );
+            console.log(`[Webhook] Successfully ran activateProjectPlan for project ${featuredProjectId}`);
+          } catch (actErr) {
+            console.error(`[Webhook] Error in activateProjectPlan:`, actErr);
+          }
 
           // Create activity event
           if (isNewProject) {
