@@ -39,10 +39,10 @@ export interface CheckoutSessionResult {
 
 export async function createCheckoutSession(
   params: CheckoutSessionParams,
-  productId?: string
+  productId: string
 ): Promise<CheckoutSessionResult> {
   const client = getDodoClient();
-  const finalProductId = productId || process.env.DODO_PAYMENTS_PRODUCT_ID;
+  const finalProductId = productId;
 
   if (!finalProductId) {
     throw new Error(

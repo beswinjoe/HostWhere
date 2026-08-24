@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
               featured_project_id: projectBefore.id,
               project_name: projectBefore.project_name,
               description: `${projectBefore.project_name} activated ${planConfig.name} for ${planConfig.durationDays} days`,
-              metadata: { plan: planConfig.id },
+              metadata: { plan: planConfig.id, payment_id: paymentId },
             });
           } else if (isUpgrade) {
             await createActivityEvent({
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
               featured_project_id: projectBefore.id,
               project_name: projectBefore.project_name,
               description: `${projectBefore.project_name} upgraded to ${planConfig.name}`,
-              metadata: { plan: planConfig.id },
+              metadata: { plan: planConfig.id, payment_id: paymentId },
             });
           } else {
             await createActivityEvent({
@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
               featured_project_id: projectBefore.id,
               project_name: projectBefore.project_name,
               description: `${projectBefore.project_name} extended its ${planConfig.name} plan`,
-              metadata: { plan: planConfig.id },
+              metadata: { plan: planConfig.id, payment_id: paymentId },
             });
           }
 

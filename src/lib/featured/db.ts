@@ -120,71 +120,26 @@ export async function activateProjectPlan(
   paymentId: string
 ): Promise<FeaturedProject> {
   const supabase = getSupabaseAdminClient();
-  const current = await getFeaturedProjectById(id);
-  if (!current) throw new Error("Project not found.");
-
-  // ── Idempotency Check ──────────────────────────────────────
-  const socialLinks = (current.social_links as Record<string, unknown>) || {};
-  const processedPayments = (socialLinks._processed_payments as string[]) || [];
-  if (processedPayments.includes(paymentId)) {
-    console.log(`[Featured DB] Project ${id} already activated for payment ${paymentId}`);
-    return current;
-  }
-  // ───────────────────────────────────────────────────────────
-
-  const now = new Date();
   
-  // Parse existing expires_at or default to now if expired/missing
-  const currentExpiresAt = current.expires_at ? new Date(current.expires_at) : now;
-  const isCurrentlyActive = current.featured_active && currentExpiresAt > now;
-
-  let newFeaturedAt = current.featured_at ? new Date(current.featured_at) : now;
-  let newExpiresAt = now;
-
-  const currentPriority = current.priority || 0;
-
-  if (isCurrentlyActive) {
-    if (priority > currentPriority) {
-      // Upgrade: Take effect immediately, new featured_at so it sorts at the top of the new priority tier
-      newFeaturedAt = now;
-      newExpiresAt = new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000);
-    } else {
-      // Extend same tier (or technically lower, but that's prevented in UI)
-      // Keep existing featured_at to maintain rank, just extend the expiration
-      newFeaturedAt = new Date(current.featured_at!); // Keep existing
-      newExpiresAt = new Date(currentExpiresAt.getTime() + durationDays * 24 * 60 * 60 * 1000);
-    }
-  } else {
-    // Brand new or expired reactivation
-    newFeaturedAt = now;
-    newExpiresAt = new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000);
-  }
-
-  const { data, error } = await supabase
-    .from("featured_projects")
-    .update({
-      plan,
-      price_cents: priceCents,
-      priority,
-      featured_at: newFeaturedAt.toISOString(),
-      expires_at: newExpiresAt.toISOString(),
-      featured_active: true,
-      updated_at: now.toISOString(),
-      social_links: {
-        ...socialLinks,
-        _processed_payments: [...processedPayments, paymentId]
-      }
-    })
-    .eq("id", id)
-    .select()
-    .single();
+  // ── Atomic RPC Call ──────────────────────────────────────
+  // This RPC uses FOR UPDATE to lock the row, applies the idempotency check
+  // safely against race conditions, and returns the updated project state.
+  const { data, error } = await supabase.rpc('activate_featured_project_idempotent', {
+    p_project_id: id,
+    p_plan: plan,
+    p_price_cents: priceCents,
+    p_priority: priority,
+    p_duration_days: durationDays,
+    p_payment_id: paymentId
+  });
 
   if (error) {
-    console.error("[Featured DB] Failed to activate plan:", error);
-    throw new Error("Failed to activate project plan.");
+    console.error("[Featured DB] RPC Error in activateProjectPlan:", error);
+    throw new Error("Failed to activate project plan atomically.");
   }
 
-  return data;
+  // The RPC returns a JSON object matching FeaturedProject
+  return data as FeaturedProject;
 }
 
 export async function incrementClicks(id: string): Promise<void> {

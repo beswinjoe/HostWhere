@@ -128,6 +128,13 @@ export async function POST(request: NextRequest) {
     if (body.plan === "featured") planProductId = process.env.DODO_PAYMENTS_FEATURED_PRODUCT_ID;
     if (body.plan === "spotlight") planProductId = process.env.DODO_PAYMENTS_SPOTLIGHT_PRODUCT_ID;
 
+    if (!planProductId) {
+      console.error(`[Checkout] Missing product ID for plan '${body.plan}'`);
+      return Response.json(
+        { error: `Payment system is missing the product configuration for the ${body.plan} plan.` },
+        { status: 500 }
+      );
+    }
     const checkoutResult = await createCheckoutSession({
       amountCents: amountCents,
       metadata: {
