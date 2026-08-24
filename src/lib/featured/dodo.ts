@@ -38,21 +38,22 @@ export interface CheckoutSessionResult {
 }
 
 export async function createCheckoutSession(
-  params: CheckoutSessionParams
+  params: CheckoutSessionParams,
+  productId?: string
 ): Promise<CheckoutSessionResult> {
   const client = getDodoClient();
-  const productId = process.env.DODO_PAYMENTS_PRODUCT_ID;
+  const finalProductId = productId || process.env.DODO_PAYMENTS_PRODUCT_ID;
 
-  if (!productId) {
+  if (!finalProductId) {
     throw new Error(
-      "Missing DODO_PAYMENTS_PRODUCT_ID. Create a product in your Dodo Dashboard and set the ID."
+      "Missing Product ID. Create a product in your Dodo Dashboard and set the ID in env."
     );
   }
 
   const session = await client.checkoutSessions.create({
     product_cart: [
       {
-        product_id: productId,
+        product_id: finalProductId,
         quantity: 1,
         amount: params.amountCents, // Override price with bid amount in cents
       },
