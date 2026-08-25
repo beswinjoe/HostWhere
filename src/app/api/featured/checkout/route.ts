@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
     
     // Attempt to safely log Dodo specific error details if they exist (e.g. APIError)
     if (error && typeof error === 'object') {
-      const anyErr = error as any;
+      const anyErr = error as Record<string, unknown>;
       if ('status' in anyErr) console.error("  Status:", anyErr.status);
       if ('error' in anyErr) console.error("  Dodo Error details:", JSON.stringify(anyErr.error));
     }
@@ -176,8 +176,8 @@ export async function POST(request: NextRequest) {
       : message;
 
     // Check if the error itself dictates the status code (e.g. 401 from Dodo SDK)
-    const statusCode = (error && typeof error === 'object' && 'status' in (error as any)) 
-      ? (error as any).status 
+    const statusCode = (error && typeof error === 'object' && 'status' in (error as Record<string, unknown>)) 
+      ? (error as Record<string, unknown>).status as number
       : 500;
 
     return Response.json({ error: safeMessage }, { status: statusCode });
