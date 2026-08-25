@@ -44,8 +44,9 @@ export function HomepageFeaturedProjects() {
       <ScrollReveal>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <div className="w-16 h-16 rounded-2xl bg-neutral-50 border border-neutral-200 flex items-center justify-center mb-6 shadow-sm">
-              <Star className="w-8 h-8 text-neutral-400 fill-neutral-400" />
+            <div className="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center mb-6 shadow-[0_0_20px_-3px_rgba(251,191,36,0.3)] relative group">
+              <div className="absolute inset-0 bg-amber-400 opacity-20 blur-xl rounded-2xl group-hover:opacity-40 transition-opacity"></div>
+              <Star className="w-8 h-8 text-amber-500 fill-amber-500 relative z-10" />
             </div>
             <h2 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight mb-3 flex items-center gap-3 text-neutral-900">
               Featured Projects
@@ -56,8 +57,9 @@ export function HomepageFeaturedProjects() {
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <Link href="/featured">
-              <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-900 shadow-sm text-sm font-medium transition-colors">
+              <button className="flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-neutral-900 bg-neutral-900 text-white hover:bg-neutral-800 hover:scale-105 shadow-md text-sm font-bold transition-all">
                 Feature Your Project
+                <ArrowRight className="w-4 h-4" />
               </button>
             </Link>
           </div>
@@ -85,18 +87,21 @@ export function HomepageFeaturedProjects() {
             
             let BadgeIcon = Zap;
             let badgeColor = "text-blue-700 bg-blue-50 border-blue-200";
-            let borderColor = "border-neutral-200 hover:border-blue-300 hover:shadow-blue-100";
+            let borderColor = "border-neutral-200 hover:border-blue-400";
+            let shadowGlow = "hover:shadow-[0_0_20px_-3px_rgba(59,130,246,0.3)]";
             let gradientColor = "blue";
             
             if (planConfig?.id === "spotlight") {
               BadgeIcon = Crown;
               badgeColor = "text-purple-700 bg-purple-50 border-purple-200";
-              borderColor = "border-purple-200 hover:border-purple-400 hover:shadow-purple-100";
+              borderColor = "border-purple-200 hover:border-purple-400";
+              shadowGlow = "hover:shadow-[0_0_25px_-3px_rgba(168,85,247,0.4)]";
               gradientColor = "purple";
             } else if (planConfig?.id === "featured") {
               BadgeIcon = Star;
               badgeColor = "text-amber-700 bg-amber-50 border-amber-200";
-              borderColor = "border-amber-200 hover:border-amber-400 hover:shadow-amber-100";
+              borderColor = "border-amber-200 hover:border-amber-400";
+              shadowGlow = "hover:shadow-[0_0_25px_-3px_rgba(251,191,36,0.4)]";
               gradientColor = "amber";
             }
             
@@ -107,28 +112,28 @@ export function HomepageFeaturedProjects() {
 
             return (
               <ScrollReveal key={project.id} delay={index * 100}>
-                <div className={`bg-white p-6 rounded-2xl border transition-all duration-300 flex flex-col h-full relative overflow-hidden group shadow-sm hover:shadow-md hover:-translate-y-1 ${borderColor}`}>
-                  <div className={`absolute inset-0 bg-gradient-to-b from-${gradientColor}-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity`} />
+                <div className={`bg-white p-6 rounded-2xl border transition-all duration-500 flex flex-col h-full relative overflow-hidden group shadow-sm hover:-translate-y-1 ${borderColor} ${shadowGlow}`}>
+                  <div className={`absolute inset-0 bg-gradient-to-br from-${gradientColor}-50/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                   
                   <div className="relative z-10 flex justify-between items-start mb-6">
-                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-bold uppercase tracking-wider ${badgeColor}`}>
+                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[11px] font-black uppercase tracking-widest shadow-sm ${badgeColor}`}>
                       <BadgeIcon className="w-3.5 h-3.5" />
                       {planConfig?.name || "Featured"}
                     </div>
                     
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-50 border border-neutral-200 text-neutral-500 text-xs font-bold uppercase tracking-wider">
-                      <Clock className="w-3.5 h-3.5" />
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-50/80 backdrop-blur-sm border border-neutral-200 text-neutral-600 text-[11px] font-bold uppercase tracking-wider">
+                      <Clock className="w-3.5 h-3.5 text-neutral-400" />
                       {daysRemaining}d left
                     </div>
                   </div>
 
                   <div className="relative z-10 mb-6 flex-grow">
-                    <h3 className="font-bold text-xl text-neutral-900 tracking-tight mb-2 truncate">
+                    <h3 className="font-extrabold text-xl text-neutral-900 tracking-tight mb-2 truncate group-hover:text-black transition-colors">
                       {project.project_name}
                     </h3>
                     <div className="flex flex-wrap gap-2 mb-3">
-                      <span className="px-2 py-1 rounded-md bg-neutral-50 text-xs text-neutral-600 font-medium flex items-center gap-1.5 border border-neutral-200">
-                        <Code2 className="w-3 h-3" />
+                      <span className="px-2 py-1 rounded-md bg-neutral-100/80 text-xs text-neutral-700 font-semibold flex items-center gap-1.5 border border-neutral-200/60 backdrop-blur-sm">
+                        <Code2 className="w-3.5 h-3.5 text-neutral-500" />
                         {project.framework}
                       </span>
                     </div>
@@ -136,9 +141,9 @@ export function HomepageFeaturedProjects() {
 
                   <div className="relative z-10">
                     <Link href={`/featured/project/${project.id}`}>
-                      <button className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white hover:bg-${gradientColor}-50 text-neutral-700 hover:text-${gradientColor}-700 border border-neutral-200 hover:border-${gradientColor}-200 text-sm font-bold transition-all shadow-sm`}>
+                      <button className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white group-hover:bg-${gradientColor}-50 text-neutral-700 group-hover:text-${gradientColor}-700 border border-neutral-200 group-hover:border-${gradientColor}-300 text-sm font-bold transition-all duration-300 shadow-sm group-hover:shadow-inner`}>
                         View Project
-                        <ArrowRight className="w-4 h-4 opacity-70" />
+                        <ArrowRight className="w-4 h-4 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                       </button>
                     </Link>
                   </div>
