@@ -156,7 +156,16 @@ export async function POST(request: NextRequest) {
       bid_id: bid.id,
     });
   } catch (error) {
-    console.error("[API] Checkout error:", error);
+    console.error("[API] Checkout error caught!");
+    console.error("  Name:", error instanceof Error ? error.name : typeof error);
+    console.error("  Message:", error instanceof Error ? error.message : "Unknown");
+    
+    // Attempt to safely log Dodo specific error details if they exist (e.g. APIError)
+    if (error && typeof error === 'object') {
+      const anyErr = error as any;
+      if ('status' in anyErr) console.error("  Status:", anyErr.status);
+      if ('error' in anyErr) console.error("  Dodo Error details:", JSON.stringify(anyErr.error));
+    }
 
     const message =
       error instanceof Error ? error.message : "Failed to create checkout.";
@@ -166,6 +175,11 @@ export async function POST(request: NextRequest) {
       ? "Payment system is not configured. Please contact the site administrator."
       : message;
 
-    return Response.json({ error: safeMessage }, { status: 500 });
+    // Check if the error itself dictates the status code (e.g. 401 from Dodo SDK)
+    const statusCode = (error && typeof error === 'object' && 'status' in (error as any)) 
+      ? (error as any).status 
+      : 500;
+
+    return Response.json({ error: safeMessage }, { status: statusCode });
   }
 }

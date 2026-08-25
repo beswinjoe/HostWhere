@@ -11,6 +11,15 @@ function getDodoClient(): DodoPayments {
   const webhookKey = process.env.DODO_PAYMENTS_WEBHOOK_SECRET;
   const environment = process.env.DODO_PAYMENTS_ENVIRONMENT || "test_mode";
 
+  // Safely log the configuration (no full secrets)
+  console.log("[Dodo Payments] Initializing SDK:");
+  console.log("  - DODO_PAYMENTS_ENVIRONMENT:", environment);
+  console.log("  - API Key exists:", !!apiKey);
+  if (apiKey) {
+    console.log("  - API Key length:", apiKey.length);
+    console.log("  - API Key prefix:", apiKey.substring(0, 4) + "...");
+  }
+
   if (!apiKey) {
     throw new Error(
       "Missing DODO_PAYMENTS_API_KEY. Configure it in your environment variables."
@@ -50,7 +59,7 @@ export async function createCheckoutSession(
     );
   }
 
-  const session = await client.checkoutSessions.create({
+  const payload = {
     product_cart: [
       {
         product_id: finalProductId,
@@ -59,7 +68,13 @@ export async function createCheckoutSession(
     ],
     return_url: params.returnUrl,
     metadata: params.metadata,
-  });
+  };
+
+  console.log("[Dodo Payments] Creating Checkout Session Payload:");
+  console.log("  - Product ID:", finalProductId);
+  console.log("  - Metadata keys:", Object.keys(payload.metadata || {}));
+
+  const session = await client.checkoutSessions.create(payload);
 
   if (!session.checkout_url) {
     throw new Error("Failed to create checkout session — no checkout URL returned.");
